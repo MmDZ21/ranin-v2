@@ -35,7 +35,7 @@ export function AnimatedFeatures({
     textDuration,
     imageDuration,
     viewportAmount,
-    viewportMargin,
+    viewportMargin: viewportMargin as `${number}px ${number}px ${number}px ${number}px`,
   });
 
   const contentOrder = reverse

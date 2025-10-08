@@ -2,7 +2,7 @@ import { Container } from "@/components/ui/Container";
 import { ContactHero } from "@/components/pages/contact/ContactHero";
 import { ContactForm } from "@/components/pages/contact/ContactForm";
 import { ContactInfo } from "@/components/pages/contact/ContactInfo";
-import { ContactMap } from "@/components/pages/contact/ContactMap";
+// import { ContactMap } from "@/components/pages/contact/ContactMap";
 
 export default function ContactPage() {
   return (

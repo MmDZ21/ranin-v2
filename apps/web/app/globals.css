@@ -24,20 +24,20 @@
   /* font */
   --font-iran-sans: 'IranSans', sans-serif;
   
-  /* brand */
-  --brand: 139, 100%, 25%;        /* vibrant green */
+  /* brand (muted turquoise) */
+  --brand: 170 55% 42%;          /* muted turquoise */
   --brand-foreground: 0 0% 100%;
-  --accent: 139, 100%, 25%;       /* vibrant green */
+  --accent: 170 55% 42%;
   --accent-foreground: 0 0% 100%;
-  --info: 199 89% 65%;          /* sky-300-ish */
-  --info-foreground: 199 80% 18%;
+  --info: 195 65% 55%;           /* calm cyan-blue */
+  --info-foreground: 195 40% 15%;
   
   /* base surfaces & text */
   --background: 0 0% 100%;
-  --foreground: 224 71% 4%;     /* near-slate-950 */
-  --muted: 220 14% 96%;
-  --muted-foreground: 220 9% 46%;
-  --border: 220 13% 91%;
+  --foreground: 222 20% 10%;     /* dark neutral text */
+  --muted: 210 14% 96%;
+  --muted-foreground: 215 10% 45%;
+  --border: 210 14% 88%;
   --ring: var(--brand);
   
   /* component surfaces */
@@ -51,15 +51,15 @@
   --secondary-foreground: var(--foreground);
   
   /* radius */
-  --radius-sm: .5rem;     /* 8px */
-  --radius: 1rem;         /* 16px */
-  --radius-lg: 1.25rem;   /* 20px */
-  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-sm: .5rem;
+  --radius: 1rem;
+  --radius-lg: 1.25rem;
+  --radius-2xl: 1.5rem;
   
-  /* shadow (soft, airy) */
-  --shadow-sm: 0 1px 2px 0 hsl(220 8% 60% / .08);
-  --shadow:    0 8px 24px -8px hsl(220 8% 60% / .18), 0 2px 6px 0 hsl(220 8% 60% / .08);
-  --shadow-xl: 0 24px 48px -12px hsl(220 8% 60% / .22);
+  /* shadows (neutral + soft edges) */
+  --shadow-sm: 0 1px 2px 0 hsl(210 8% 60% / .08);
+  --shadow:    0 6px 20px -6px hsl(210 8% 60% / .14), 0 2px 6px 0 hsl(210 8% 60% / .08);
+  --shadow-xl: 0 20px 40px -10px hsl(210 8% 60% / .18);
   
   /* motion */
   --ease-standard: cubic-bezier(.2, .8, .2, 1);
@@ -68,24 +68,23 @@
   --dur-fast: 250ms;
   --dur-slow: 400ms;
   
-  /* z-layers (header/megamenu) */
+  /* z-layers */
   --z-header: 40;
   --z-overlay: 50;
   --z-megamenu: 30;
   
-  /* hero/controls tokens */
-  --hero-control-color: 0 0% 100%; /* white */
+  /* hero controls */
+  --hero-control-color: 0 0% 100%;
   --hero-control-bg: color-mix(in srgb, hsl(0 0% 100%) 12%, transparent);
-  --hero-pagination-bullet: color-mix(in srgb, hsl(0 0% 100%) 60%, transparent);
+  --hero-pagination-bullet: color-mix(in srgb, hsl(0 0% 100%) 55%, transparent);
   --hero-pagination-active: 0 0% 100%;
   
-  /* topbar tokens */
-  --topbar-bg: 220 14% 96%;
+  /* topbar */
+  --topbar-bg: 210 14% 96%;
   
-  
-  /* additional border tokens */
-  --border-light: 220 13% 91%;
-  --border-strong: 220 13% 85%;
+  /* borders */
+  --border-light: 210 14% 91%;
+  --border-strong: 210 13% 82%;
 }
 
 @theme inline {

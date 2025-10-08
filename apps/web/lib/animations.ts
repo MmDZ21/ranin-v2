@@ -9,7 +9,7 @@ export interface AnimationOptions {
   textDuration?: number;
   imageDuration?: number;
   viewportAmount?: number;
-  viewportMargin?: string;
+  viewportMargin?: `${number}px ${number}px ${number}px ${number}px`;
 }
 
 // Mobile device detection hook with SSR safety
@@ -57,7 +57,7 @@ export const defaultAnimationOptions: Required<AnimationOptions> = {
   textDuration: 0.8,
   imageDuration: 1.0,
   viewportAmount: 0.2,
-  viewportMargin: "-50px 0px -30px 0px",
+  viewportMargin: "-50px 0px -30px 0px" as const,
 };
 
 // Mobile-optimized animation options
@@ -66,7 +66,7 @@ export const mobileAnimationOptions: Required<AnimationOptions> = {
   textDuration: 0.6,  // Slightly shorter duration
   imageDuration: 0.8, // Keep reasonable duration for images
   viewportAmount: 0.2, // Same as desktop for consistency
-  viewportMargin: "-50px 0px -30px 0px", // Keep same margins as desktop
+  viewportMargin: "-50px 0px -30px 0px" as const, // Keep same margins as desktop
 };
 
 // Container animation with stagger support
@@ -194,7 +194,7 @@ export function useEnterAnimation(options: AnimationOptions = {}) {
   const ref = useRef(null);
   const isInView = useInView(ref, {
     amount: viewportAmount,
-    margin: viewportMargin as any, // Handle margin type compatibility
+    margin: viewportMargin,
     once: true,
   });
 

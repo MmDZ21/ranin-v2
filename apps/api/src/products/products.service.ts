@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Product } from '@prisma/client';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { AdvancedSearchDto } from './dto/advanced-search.dto';
+import { Product } from 'src/generated/client';
 
 @Injectable()
 export class ProductsService {
@@ -82,8 +83,22 @@ export class ProductsService {
 
   // Create new product
   async create(createProductDto: CreateProductDto): Promise<Product> {
+    const { image, ...productData } = createProductDto;
+    
+    const data: any = { ...productData };
+    
+    if (image) {
+      data.images = {
+        create: {
+          url: image,
+          alt: productData.name,
+          order: 0
+        }
+      };
+    }
+
     return this.prisma.product.create({
-      data: createProductDto,
+      data,
       include: {
         category: true,
         images: {
@@ -102,9 +117,29 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
+    const { image, ...productData } = updateProductDto;
+    const data: any = { ...productData };
+
+    if (image !== undefined) {
+      if (image) {
+        data.images = {
+          deleteMany: {},
+          create: {
+            url: image,
+            alt: productData.name || existingProduct.name,
+            order: 0
+          }
+        };
+      } else {
+        data.images = {
+          deleteMany: {}
+        };
+      }
+    }
+
     return this.prisma.product.update({
       where: { id },
-      data: updateProductDto,
+      data,
       include: {
         category: true,
         images: {
@@ -149,18 +184,82 @@ export class ProductsService {
     });
   }
 
-  // Search products
+  // Search products - searches across all relevant fields
   async search(query: string, limit = 20, offset = 0): Promise<Product[]> {
     return this.prisma.product.findMany({
       where: {
         published: true,
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
+          { sku: { contains: query, mode: 'insensitive' } },
           { shortDesc: { contains: query, mode: 'insensitive' } },
+          { longDesc: { contains: query, mode: 'insensitive' } },
           { brand: { contains: query, mode: 'insensitive' } },
+          { modelNumber: { contains: query, mode: 'insensitive' } },
           { tags: { has: query } },
+          { 
+            category: {
+              OR: [
+                { name: { contains: query, mode: 'insensitive' } },
+                { slug: { contains: query, mode: 'insensitive' } },
+              ]
+            }
+          },
         ],
       },
+      take: limit,
+      skip: offset,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        category: true,
+        images: { orderBy: { order: 'asc' } },
+      },
+    });
+  }
+
+  // Advanced search with specific filters
+  async advancedSearch(filters: AdvancedSearchDto): Promise<Product[]> {
+    const { name, sku, brand, category, limit = 20, offset = 0 } = filters;
+    
+    const where: {
+      published: boolean;
+      name?: { contains: string; mode: 'insensitive' };
+      sku?: { contains: string; mode: 'insensitive' };
+      brand?: { contains: string; mode: 'insensitive' };
+      category?: {
+        OR: Array<{
+          name?: { contains: string; mode: 'insensitive' };
+          slug?: { contains: string; mode: 'insensitive' };
+        }>;
+      };
+    } = {
+      published: true,
+    };
+
+    // Build dynamic where conditions
+    if (name) {
+      where.name = { contains: name, mode: 'insensitive' };
+    }
+    
+    if (sku) {
+      where.sku = { contains: sku, mode: 'insensitive' };
+    }
+    
+    if (brand) {
+      where.brand = { contains: brand, mode: 'insensitive' };
+    }
+    
+    if (category) {
+      where.category = {
+        OR: [
+          { name: { contains: category, mode: 'insensitive' } },
+          { slug: { contains: category, mode: 'insensitive' } },
+        ],
+      };
+    }
+
+    return this.prisma.product.findMany({
+      where,
       take: limit,
       skip: offset,
       orderBy: { createdAt: 'desc' },

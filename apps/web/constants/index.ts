@@ -1,4 +1,14 @@
 import { slugify } from "@/lib/utils"
+import { 
+  LayoutDashboard, 
+  Package, 
+  FolderTree, 
+  ShoppingCart, 
+  Users, 
+  Settings,
+  BookOpen,
+  MessageSquare
+} from "lucide-react"
 
 export type TopBarConfig = {
   message: string
@@ -11,14 +21,15 @@ export type TopBarConfig = {
 }
 
 export const TOPBAR_CONFIG: TopBarConfig = {
-    message: 'معرفی GridOS 3.0 — مدیریت یکپارچه انرژی برای شرکت‌های چندسایته.',
-    shortMessage: 'آشنایی با GridOS 3.0',
-    showLanguage: true,
-    languageLabel: 'فا',
-    showContact: true,
-    contactLabel: 'تماس با فروش',
-    contactHref: undefined,
-  }
+  message:
+    'نمایندگی رسمی محصولات اشنایدر الکتریک — تأمین‌کننده تجهیزات برق صنعتی و اتوماسیون',
+  shortMessage: 'نمایندگی اشنایدر الکتریک',
+  showLanguage: true,
+  languageLabel: 'فا',
+  showContact: true,
+  contactLabel: 'درخواست مشاوره و پیش‌فاکتور',
+  contactHref: '/contact',
+};
 
 export type NavBarConfig = {
   brand: string
@@ -708,3 +719,103 @@ export const productCategories: ProductCategoryType[] = [
     ],
   },
 ];
+
+export const sidebarItems = [
+  {
+    title: "داشبورد",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "محصولات",
+    url: "/dashboard/products",
+    icon: Package,
+    items: [
+      {
+        title: "همه محصولات",
+        url: "/dashboard/products",
+      },
+      {
+        title: "افزودن محصول",
+        url: "/dashboard/products/new",
+      },
+      {
+        title: "دسته‌بندی محصولات",
+        url: "/dashboard/products/categories",
+      },
+    ],
+  },
+  {
+    title: "دسته‌بندی‌ها",
+    url: "/dashboard/categories",
+    icon: FolderTree,
+    items: [
+      {
+        title: "همه دسته‌بندی‌ها",
+        url: "/dashboard/categories",
+      },
+      {
+        title: "افزودن دسته‌بندی",
+        url: "/dashboard/categories/new",
+      },
+    ],
+  },
+  {
+    title: "بلاگ",
+    url: "/dashboard/blog",
+    icon: BookOpen,
+    items: [
+      {
+        title: "همه نوشته‌ها",
+        url: "/dashboard/blog",
+      },
+      {
+        title: "نویسندگان",
+        url: "/dashboard/blog/authors",
+      },
+      {
+        title: "تگ‌ها",
+        url: "/dashboard/blog/tags",
+      },
+    ],
+  },
+  {
+    title: "پیام‌ها",
+    url: "/dashboard/leads",
+    icon: MessageSquare,
+  },
+  {
+    title: "کاربران",
+    url: "/dashboard/users",
+    icon: Users,
+    items: [
+      {
+        title: "همه کاربران",
+        url: "/dashboard/users",
+      },
+      {
+        title: "افزودن کاربر",
+        url: "/dashboard/users/new",
+      },
+    ],
+  },
+  {
+    title: "تنظیمات",
+    url: "/dashboard/settings",
+    icon: Settings,
+    items: [
+      {
+        title: "تنظیمات عمومی",
+        url: "/dashboard/settings",
+      },
+      {
+        title: "تنظیمات سایت",
+        url: "/dashboard/settings/site",
+      },
+      {
+        title: "پشتیبان‌گیری",
+        url: "/dashboard/settings/backup",
+      },
+    ],
+  },
+]

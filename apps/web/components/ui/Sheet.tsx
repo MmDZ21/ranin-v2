@@ -1,8 +1,8 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 interface SheetProps {
   open: boolean;
@@ -14,19 +14,33 @@ interface SheetContentProps {
   className?: string;
   children: ReactNode;
   side?: "left" | "right" | "top" | "bottom";
+  style?: React.CSSProperties;
+  "data-sidebar"?: string;
+  "data-slot"?: string;
+  "data-mobile"?: string;
+  open?: boolean;
 }
 
 interface SheetOverlayProps {
   className?: string;
   onClick?: () => void;
+  open?: boolean;
 }
 
 export function Sheet({ open, onOpenChange, children }: SheetProps) {
+  const [isMounted, setIsMounted] = useState(open);
+
   useEffect(() => {
     if (open) {
+      setIsMounted(true);
       document.body.style.overflow = "hidden";
     } else {
+      // Delay unmounting to allow close animation to play
+      const timer = setTimeout(() => {
+        setIsMounted(false);
+      }, 300); // Match the animation duration
       document.body.style.overflow = "";
+      return () => clearTimeout(timer);
     }
     
     return () => {
@@ -50,7 +64,7 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
     };
   }, [open, onOpenChange]);
 
-  if (!open) return null;
+  if (!isMounted) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-[var(--z-overlay)]">
@@ -60,11 +74,13 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
   );
 }
 
-export function SheetOverlay({ className, onClick }: SheetOverlayProps) {
+export function SheetOverlay({ className, onClick, open }: SheetOverlayProps) {
   return (
     <div
-      className={clsx(
+      className={cn(
         "fixed inset-0 bg-black/50 backdrop-blur-sm",
+        open ? "animate-in fade-in-0" : "animate-out fade-out-0",
+        "duration-300",
         className
       )}
       onClick={onClick}
@@ -72,7 +88,7 @@ export function SheetOverlay({ className, onClick }: SheetOverlayProps) {
   );
 }
 
-export function SheetContent({ className, children, side = "right" }: SheetContentProps) {
+export function SheetContent({ className, children, side = "right", style, "data-sidebar": dataSidebar, "data-slot": dataSlot, "data-mobile": dataMobile, open = true }: SheetContentProps) {
   const sideClasses = {
     right: "right-0 top-0 h-full w-80 ",
     left: "left-0 top-0 h-full w-80 ",
@@ -80,20 +96,27 @@ export function SheetContent({ className, children, side = "right" }: SheetConte
     bottom: "bottom-0 left-0 w-full h-80 border-t",
   };
 
+  const state = open ? "open" : "closed";
+
   return (
     <div
-      className={clsx(
-        "fixed bg-background text-foreground shadow-xl",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out",
-        "data-[state=closed]:duration-300 data-[state=open]:duration-500",
-        side === "right" && "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
-        side === "left" && "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
-        side === "top" && "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
-        side === "bottom" && "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+      className={cn(
+        "fixed bg-background text-foreground shadow-xl z-[calc(var(--z-overlay)+1)]",
+        open ? "animate-in" : "animate-out",
+        "duration-300",
+        side === "right" && (open ? "slide-in-from-right" : "slide-out-to-right"),
+        side === "left" && (open ? "slide-in-from-left" : "slide-out-to-left"),
+        side === "top" && (open ? "slide-in-from-top" : "slide-out-to-top"),
+        side === "bottom" && (open ? "slide-in-from-bottom" : "slide-out-to-bottom"),
         sideClasses[side],
         className
       )}
-      data-state="open"
+      data-state={state}
+      style={style}
+      data-sidebar={dataSidebar}
+      data-slot={dataSlot}
+      data-mobile={dataMobile}
+      onClick={(e) => e.stopPropagation()}
     >
       {children}
     </div>
@@ -102,7 +125,7 @@ export function SheetContent({ className, children, side = "right" }: SheetConte
 
 export function SheetHeader({ className, children }: { className?: string; children: ReactNode }) {
   return (
-    <div className={clsx("px-6 py-4 border-b", className)}>
+    <div className={cn("px-6 py-4 border-b", className)}>
       {children}
     </div>
   );
@@ -110,7 +133,7 @@ export function SheetHeader({ className, children }: { className?: string; child
 
 export function SheetTitle({ className, children }: { className?: string; children: ReactNode }) {
   return (
-    <h2 className={clsx("text-lg font-semibold text-foreground", className)}>
+    <h2 className={cn("text-lg font-semibold text-foreground", className)}>
       {children}
     </h2>
   );
@@ -119,7 +142,7 @@ export function SheetTitle({ className, children }: { className?: string; childr
 export function SheetClose({ className, onClick, children }: { className?: string; onClick?: () => void; children: ReactNode }) {
   return (
     <button
-      className={clsx(
+      className={cn(
         "absolute right-4 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
         className
       )}

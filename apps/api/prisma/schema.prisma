@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -8,13 +10,14 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  role      Role     @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  password           String
+  hashedRefreshToken String?
+  name               String?
+  role               Role     @default(ADMIN)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 enum Role {
@@ -23,13 +26,15 @@ enum Role {
 }
 
 model Category {
-  id        String     @id @default(cuid())
-  name      String
-  slug      String     @unique
-  parentId  String?
-  parent    Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
-  children  Category[] @relation("CategoryToCategory")
-  products  Product[]
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  image       String?
+  parentId    String?
+  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryToCategory")
+  products    Product[]
 }
 
 model Product {
@@ -38,12 +43,13 @@ model Product {
   name            String
   slug            String         @unique
   shortDesc       String?
-  longDesc        String?        // markdown or HTML
+  longDesc        String? // markdown or HTML
   brand           String?
   modelNumber     String?
   categoryId      String?
   category        Category?      @relation(fields: [categoryId], references: [id])
-  specs           Json?          // key-value specs
+  specs           Json? // key-value specs
+  features        String[]       @default([])
   tags            String[]       @default([])
   images          ProductImage[]
   catalogs        CatalogFile[]
@@ -56,18 +62,18 @@ model Product {
 }
 
 model ProductImage {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
   url       String
   alt       String?
-  order     Int      @default(0)
+  order     Int     @default(0)
 }
 
 model CatalogFile {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
   url       String
   filename  String
   size      Int?
@@ -135,12 +141,12 @@ model PostTag {
 }
 
 model PostImage {
-  id      String   @id @default(cuid())
-  postId  String
-  post    BlogPost @relation(fields: [postId], references: [id])
-  url     String
-  alt     String?
-  order   Int      @default(0)
+  id     String   @id @default(cuid())
+  postId String
+  post   BlogPost @relation(fields: [postId], references: [id])
+  url    String
+  alt    String?
+  order  Int      @default(0)
 }
 
 enum PostStatus {

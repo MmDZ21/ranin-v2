@@ -1,19 +1,19 @@
-import { ProductDTO } from "@/constants";
+import { Product } from "@/types/product.types";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Phone, ExternalLink } from "lucide-react";
 
-export default function ProductCard({ product }: { product: ProductDTO }) {
+export default function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group relative bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-100/50 transition-all duration-300 hover:-translate-y-1">
       <Link href={`/products/${product.slug}`} className="block">
         {/* Image Container */}
         <div className="relative w-full bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
           <div className="aspect-square flex items-center justify-center p-4 sm:p-6">
-            {product.imageUrl ? (
+            {product.images && product.images.length > 0 ? (
               <Image
-                src={product.imageUrl}
+                src={product.images[0].url}
                 alt={product.name}
                 className="object-contain w-full h-full group-hover:scale-105 transition-transform duration-300"
                 width={300}
@@ -51,7 +51,7 @@ export default function ProductCard({ product }: { product: ProductDTO }) {
             
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-500 font-mono bg-gray-50 px-2 py-1 rounded-md">
-                {product.code}
+                {product.sku ?? product.modelNumber ?? product.slug}
               </span>
             </div>
           </div>

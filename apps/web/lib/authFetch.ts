@@ -1,0 +1,30 @@
+"use server";
+
+import { refreshToken } from "./auth";
+import { getSession } from "./session";
+
+export const authFetch = async(url:string | URL, options: RequestInit = {})=>{
+    
+    const session = await getSession();
+    options.headers = {
+        ...options.headers,
+        "Authorization": `Bearer ${session?.accessToken}`,
+    }
+    let response = await fetch(url, options);
+    if (response.status === 401) {
+        
+        if (!session?.refreshToken) throw new Error("Unauthorized");
+
+        const newAccessToken = await refreshToken(session?.refreshToken);
+        if (!newAccessToken) {
+            throw new Error("Failed to refresh token");
+        }
+        options.headers = {
+            ...options.headers,
+            "Authorization": `Bearer ${newAccessToken}`,
+        }
+        response = await fetch(url, options);
+    }
+
+    return response;
+}

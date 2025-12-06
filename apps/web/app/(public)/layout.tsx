@@ -20,7 +20,7 @@ export default function PublicLayout({
       <div className="sticky inset-x-0 top-0 z-[30]">
         <Header />
       </div>
-      <div className="p-0 m-0">{children}</div>
+      <div className="p-0 m-0 min-h-screen">{children}</div>
       <Footer {...FOOTER_CONFIG} />
     </div>
   );

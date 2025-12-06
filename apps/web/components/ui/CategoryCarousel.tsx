@@ -2,7 +2,7 @@
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import { productCategories, ProductCategoryType } from "@/constants";
+import { Category } from "@/types/category.types";
 import CategoryCard, { CategoryCardProps } from "./CategoryCard";
 
 // Import Swiper styles
@@ -11,8 +11,9 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 interface CategoryCarouselProps {
+  categories: Category[];
   activeCategoryId?: string;
-  onCategoryClick?: (category: ProductCategoryType) => void;
+  onCategoryClick?: (category: Category) => void;
   cardSize?: CategoryCardProps["size"];
   autoplay?: boolean;
   autoplayDelay?: number;
@@ -21,6 +22,7 @@ interface CategoryCarouselProps {
 }
 
 export default function CategoryCarousel({
+  categories,
   activeCategoryId,
   cardSize = "md",
   autoplay = true,
@@ -54,7 +56,7 @@ export default function CategoryCarousel({
           </div>
         </div>
         <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
-          <span>8 دسته‌بندی</span>
+          <span>{categories.length} دسته‌بندی</span>
           <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
         </div>
       </div>
@@ -112,7 +114,7 @@ export default function CategoryCarousel({
         }}
         className="category-swiper"
       >
-        {productCategories.map((category) => (
+        {categories.map((category) => (
           <SwiperSlide className="py-2" key={category.id}>
             <div
               className={`relative bg-transparent ${
@@ -123,10 +125,10 @@ export default function CategoryCarousel({
             >
               <CategoryCard
                 title={category.name}
-                description={category.description}
+                description={category.description ?? ""}
                 categoryHref={`/products?category=${category.slug}`}
-                productCount={`${category.productCount} محصول`}
-                imageSrc="/images/relay.png"
+                productCount={`${category._count?.products ?? 0}`}
+                imageSrc={category.image ?? "/images/relay.png"}
                 size={cardSize}
               />
             </div>

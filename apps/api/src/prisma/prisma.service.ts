@@ -1,7 +1,6 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaClient } from '../generated';
-import type { PrismaClient as PrismaClientType } from '../generated';
+import { PrismaClient } from '../generated/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
@@ -15,11 +14,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       throw new Error('DATABASE_URL is not defined');
     }
     
-    this.pool = new Pool({
+    const pool = new Pool({
       connectionString,
     });
-    const adapter = new PrismaPg(this.pool);
+    const adapter = new PrismaPg(pool);
     super({ adapter });
+    this.pool = pool;
   }
 
   async onModuleInit() {
@@ -31,6 +31,3 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     await this.pool.end();
   }
 }
-
-// Type assertion to ensure PrismaService has all PrismaClient properties
-export type PrismaServiceType = PrismaClientType;

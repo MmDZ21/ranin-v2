@@ -1,33 +1,28 @@
-"use client";
-
 import CategoryCard from "@/components/ui/CategoryCard";
-
-export interface Category {
-  title: string;
-  description: string;
-  icon: "plug" | "lightning" | "shield";
-  categoryHref: string;
-  productCount?: string;
-}
+import { Category } from "@/types/category.types";
 
 interface ProductsCategoriesProps {
   categories: Category[];
-  ctaText: string;
-  ctaHref: string;
 }
 
-export default function ProductsCategories({
-  categories,
-}: ProductsCategoriesProps) {
+export default function ProductsCategories({ categories }: ProductsCategoriesProps) {
+  if (categories.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-600">هیچ دسته‌بندی‌ای یافت نشد</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {categories.map((category, i) => (
+      {categories.map((category) => (
         <CategoryCard
-          key={i}
-          title={category.title}
-          description={category.description}
-          categoryHref={category.categoryHref}
-          productCount={category.productCount}
+          key={category.id}
+          title={category.name}
+          description={category.description || ""}
+          categoryHref={"products?category=" + category.slug}
+          productCount={category._count?.products?.toString()}
         />
       ))}
     </div>

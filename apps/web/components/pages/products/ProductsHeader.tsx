@@ -1,24 +1,24 @@
 "use client";
-
-import { Separator } from "@/components/ui/separator";
 import CategoryCarousel from "@/components/ui/CategoryCarousel";
 import { motion } from "motion/react";
 import { useEnterAnimation } from "@/lib/animations";
-import { productCategories } from "@/constants";
+import { Category } from "@/types/category.types";
 
 interface ProductsHeaderProps {
+  categories: Category[];
   activeCategorySlug: string;
+  label?: string; // static page h1
 }
 
-export function ProductsHeader({ activeCategorySlug }: ProductsHeaderProps) {
+export function ProductsHeader({ categories, activeCategorySlug }: ProductsHeaderProps) {
   const { ref, animate, variants } = useEnterAnimation({
     staggerDelay: 0.2,
     textDuration: 0.6,
   });
 
   const activeCategory =
-    productCategories.find((cat) => cat.slug === activeCategorySlug) ||
-    productCategories[0];
+    categories.find((cat) => cat.slug === activeCategorySlug) ||
+    categories[0];
 
   return (
     <motion.div
@@ -27,13 +27,6 @@ export function ProductsHeader({ activeCategorySlug }: ProductsHeaderProps) {
       animate={animate}
       variants={variants.container}
     >
-      <motion.div 
-        className="flex items-center gap-2 pb-6 sm:pb-6"
-        variants={variants.fadeInUp}
-      >
-        <Separator orientation="horizontal" className="!w-4 bg-primary" />
-        <h1 className="text-sm text-primary font-bold">محصولات</h1>
-      </motion.div>
 
       {/* دسته‌بندی‌ها - Carousel */}
       <motion.div 
@@ -41,6 +34,7 @@ export function ProductsHeader({ activeCategorySlug }: ProductsHeaderProps) {
         variants={variants.fadeInUp}
       >
         <CategoryCarousel
+          categories={categories}
           activeCategoryId={activeCategory.id}
           cardSize="sm"
           autoplay={false}

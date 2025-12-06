@@ -134,7 +134,7 @@ export default function CategoryCard({
           </p>
           {productCount && (
             <p className={productCountVariants({ size })}>
-              {productCount}
+              {productCount} محصول
             </p>
           )}
         </div>

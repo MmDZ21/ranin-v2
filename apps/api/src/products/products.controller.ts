@@ -14,7 +14,9 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AdvancedSearchDto } from './dto/advanced-search.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
+import { Product } from 'src/generated/client';
 
 @Controller('products')
 export class ProductsController {
@@ -23,7 +25,7 @@ export class ProductsController {
   // Public endpoints (for frontend)
   
   @Get()
-  async findPublished(@Query('limit') limit?: string) {
+  async findPublished(@Query('limit') limit?: string): Promise<Product[]> {
     return this.productsService.findPublished(Number(limit) || 20);
   }
 
@@ -32,9 +34,14 @@ export class ProductsController {
     @Query('q') query: string,
     @Query('limit') limit?: string,
     @Query('offset') offset?: string
-  ) {
+  ): Promise<Product[]> {
     if (!query) return [];
     return this.productsService.search(query, Number(limit) || 20, Number(offset) || 0);
+  }
+
+  @Get('search/advanced')
+  async advancedSearch(@Query() query: AdvancedSearchDto): Promise<Product[]> {
+    return await this.productsService.advancedSearch(query);
   }
 
   @Get('category/:categoryId')
@@ -42,17 +49,17 @@ export class ProductsController {
     @Param('categoryId') categoryId: string,
     @Query('limit') limit?: string,
     @Query('offset') offset?: string
-  ) {
+  ): Promise<Product[]> {
     return this.productsService.findByCategory(categoryId, Number(limit) || 20, Number(offset) || 0);
   }
 
   @Get('slug/:slug')
-  async findBySlug(@Param('slug') slug: string) {
+  async findBySlug(@Param('slug') slug: string): Promise<Product | null> {
     return this.productsService.findBySlug(slug);
   }
 
   @Get('sku/:sku')
-  async findBySku(@Param('sku') sku: string) {
+  async findBySku(@Param('sku') sku: string): Promise<Product | null> {
     return this.productsService.findBySku(sku);
   }
 
@@ -63,7 +70,7 @@ export class ProductsController {
     @Query('published') published?: string,
     @Query('limit') limit?: string,
     @Query('offset') offset?: string
-  ) {
+  ): Promise<Product[]> {
     const publishedFilter = published === 'true' ? true : published === 'false' ? false : undefined;
     return this.productsService.findAll(
       publishedFilter, 
@@ -73,14 +80,14 @@ export class ProductsController {
   }
 
   @Get('admin/:id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string): Promise<Product | null> {
     return this.productsService.findOne(id);
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createProductDto: CreateProductDto) {
+  async create(@Body() createProductDto: CreateProductDto): Promise<Product> {
     return this.productsService.create(createProductDto);
   }
 
@@ -89,14 +96,14 @@ export class ProductsController {
   async update(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto
-  ) {
+  ): Promise<Product> {
     return this.productsService.update(id, updateProductDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<Product> {
     return this.productsService.remove(id);
   }
 }

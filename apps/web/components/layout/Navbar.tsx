@@ -3,21 +3,14 @@
 import { useState } from "react";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "../ui/navigation-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetOverlay,  } from "../ui/Sheet";
-import { Input } from "../ui/input";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { LogInIcon } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Container } from "../ui/Container";
 import { NavBarConfig } from "@/constants";
+import { SearchModal } from "../ui/SearchModal";
 
-// Icon components
-const Search = ({ className = "h-4 w-4" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <circle cx="11" cy="11" r="7" />
-    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-  </svg>
-);
 
 export default function NavBar(props: NavBarConfig) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -52,12 +45,12 @@ export default function NavBar(props: NavBarConfig) {
               {(props.items ?? []).map((item, idx) => (
                 <NavigationMenuItem key={idx}>
                   {item.href ? (
-                    <NavigationMenuLink href={item.href} className="rounded-sm p-2 text-foreground hover:bg-accent">
+                    <NavigationMenuLink href={item.href} className="rounded-sm p-2 text-foreground hover:bg-primary">
                       {item.label}
                     </NavigationMenuLink>
                   ) : (
                     <>
-                      <NavigationMenuTrigger className="rounded-sm p-2 text-foreground hover:bg-accent data-[state=open]:bg-accent hover:text-accent-foreground">
+                      <NavigationMenuTrigger className="rounded-sm p-2 text-foreground hover:bg-primary data-[state=open]:bg-primary hover:text-primary-foreground">
                         {item.label}
                       </NavigationMenuTrigger>
                       {item.megaMenu ? (
@@ -69,9 +62,9 @@ export default function NavBar(props: NavBarConfig) {
                                 <ul className="space-y-3">
                                   {column.links.map((link, linkIdx) => (
                                     <li key={linkIdx}>
-                                      <a href={link.href} className="group block rounded-lg p-3 transition-colors duration-200 hover:bg-accent">
-                                        <div className="mb-1 font-medium text-foreground group-hover:text-accent-foreground">{link.label}</div>
-                                        {link.description && <div className="text-sm text-muted-foreground group-hover:text-accent-foreground/80">{link.description}</div>}
+                                      <a href={link.href} className="group block rounded-lg p-3 transition-colors duration-200 hover:bg-primary">
+                                        <div className="mb-1 font-medium text-foreground group-hover:text-primary-foreground">{link.label}</div>
+                                        {link.description && <div className="text-sm text-muted-foreground group-hover:text-primary-foreground/80">{link.description}</div>}
                                       </a>
                                     </li>
                                   ))}
@@ -91,15 +84,8 @@ export default function NavBar(props: NavBarConfig) {
 
         {/* Desktop Right Side Actions */}
         <div className="hidden lg:flex items-center gap-4">
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="h-4 w-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 z-10" />
-            <Input 
-              placeholder="جستجو..." 
-              className="w-64 bg-transparent text-sm rounded-full pl-10 placeholder:text-muted-foreground border border-border " 
-            />
-          </div>
-          
+          {/* Search Modal */}
+          <SearchModal />
           
           {/* Sign In Button */}
           <Button variant="default" className="gap-2">
@@ -123,13 +109,9 @@ export default function NavBar(props: NavBarConfig) {
           
           {/* Mobile Search and Actions */}
           <div className="px-4 py-4 border-b border-border/50">
-            {/* Mobile Search */}
-            <div className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 mb-3">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="جستجو..."
-                className="flex-1 border-0 bg-transparent text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0 placeholder:text-muted-foreground" 
-              />
+            {/* Mobile Search Modal */}
+            <div className="mb-3">
+              <SearchModal />
             </div>
             
             {/* Mobile Actions */}

@@ -1,115 +1,44 @@
 
-"use client";
-
-import { motion } from "motion/react";
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
-import ProductsCategories from "./productsCategories";
-import { useEnterAnimation } from "@/lib/animations";
+import { getCategories } from "@/actions/products";
 import { ProductsCategoriesConfig } from "@/constants";
 import { Container } from "../ui/Container";
-import { Heading } from "../ui/Heading";
-import { Text } from "../ui/Text";
-import { Button } from "../ui/Button";
-import { FullScreenSection } from "../ui/FullScreenSection";
 import { Section } from "../ui/Section";
+import ProductsClient from "./ProductsClient";
 
-export function Products(props: ProductsCategoriesConfig) {
-  const { title, subtitle, ctaText, ctaHref, categories } = props;
+
+export async function Products(props: ProductsCategoriesConfig) {
+  const categoriesResult = await getCategories();
+  const { title, subtitle, ctaText, ctaHref } = props;
   const fullScreen = false; // Force fullscreen mode
 
-  const { ref, animate, variants } = useEnterAnimation({
-    staggerDelay: 0.2,
-    textDuration: 0.8,
-  });
-
-  const header = (
-    <Container className="mb-8">
-      <motion.div
-        ref={ref}
-        initial="offscreen"
-        animate={animate}
-        variants={variants.container}
-      >
-        <motion.div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4" variants={variants.fadeInUp}>
-          <motion.div className="flex-1" variants={variants.fadeInUp}>
-            <Heading level={2} className="text-xl md:text-2xl font-semibold tracking-tight">
-              {title}
-            </Heading>
-            <Text className="text-sm text-muted-foreground mt-1">
-              {subtitle}
-            </Text>
-          </motion.div>
-          {/* Button visible only on desktop */}
-          <motion.div variants={variants.fadeInUp} className="hidden sm:block">
-            <Button variant="default" asChild className="w-auto">
-              <Link href={ctaHref} className="flex items-center gap-2">
-                {ctaText}
-                <ChevronLeft className="h-4 w-4" />
-              </Link>
-            </Button>
-          </motion.div>
-        </motion.div>
-      </motion.div>
-    </Container>
-  );
-
-  const mobileButton = (
-    <Container className="mt-8">
-      <motion.div
-        initial="offscreen"
-        animate={animate}
-        variants={variants.container}
-      >
-        <motion.div variants={variants.fadeInUp} className="sm:hidden flex justify-center">
-          <Button variant="default" asChild className="w-full">
-            <Link href={ctaHref} className="flex items-center justify-center gap-2">
-              {ctaText}
-              <ChevronLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-        </motion.div>
-      </motion.div>
-    </Container>
-  );
-
-  const content = (
-    <Container className={fullScreen ? "max-w-7xl xl:max-w-[1400px] 2xl:max-w-[1600px]" : ""}>
-      <motion.div
-        initial="offscreen"
-        animate={animate}
-        variants={variants.container}
-      >
-        <motion.div variants={variants.fadeInUp} className="md:py-4">
-          <ProductsCategories
-            categories={categories}
-            ctaText={ctaText}
-            ctaHref={ctaHref}
-          />
-        </motion.div>
-      </motion.div>
-    </Container>
-  );
-
-  if (fullScreen) {
+  // Handle error state
+  if (!categoriesResult.success) {
     return (
-      <FullScreenSection background="default" align="start">
-        <div className="w-full">
-          {header}
-          {content}
-          {mobileButton}
+      <Section className="bg-muted/20">
+        <div className="py-8 md:py-10 lg:py-14">
+          <Container>
+            <div className="text-center">
+              <h2 className="text-xl font-semibold text-red-600 mb-2">
+                خطا در بارگذاری دسته‌بندی‌ها
+              </h2>
+              <p className="text-gray-600">{categoriesResult.error}</p>
+            </div>
+          </Container>
         </div>
-      </FullScreenSection>
+      </Section>
     );
   }
 
+  const categories = (categoriesResult.data || []).slice(0, 3);
+
   return (
-    <Section className="bg-muted/20">
-      <div className="py-8 md:py-10 lg:py-14">
-        {header}
-        {content}
-        {mobileButton}
-      </div>
-    </Section>
+    <ProductsClient
+      title={title}
+      subtitle={subtitle}
+      ctaText={ctaText}
+      ctaHref={ctaHref}
+      categories={categories}
+      fullScreen={fullScreen}
+    />
   );
 }

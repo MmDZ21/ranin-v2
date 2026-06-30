@@ -3,16 +3,20 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AdvancedSearchDto } from './dto/advanced-search.dto';
-import { Product } from 'src/generated/client';
+import { Product } from '../generated/client';
 
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   // Get all products with optional filtering
-  async findAll(published?: boolean, limit = 50, offset = 0): Promise<Product[]> {
+  async findAll(
+    published?: boolean,
+    limit = 50,
+    offset = 0,
+  ): Promise<Product[]> {
     const where = published !== undefined ? { published } : {};
-    
+
     return this.prisma.product.findMany({
       where,
       take: limit,
@@ -21,7 +25,7 @@ export class ProductsService {
       include: {
         category: true,
         images: {
-          orderBy: { order: 'asc' }
+          orderBy: { order: 'asc' },
         },
         catalogs: true,
       },
@@ -37,7 +41,7 @@ export class ProductsService {
       include: {
         category: true,
         images: {
-          orderBy: { order: 'asc' }
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -50,7 +54,7 @@ export class ProductsService {
       include: {
         category: true,
         images: {
-          orderBy: { order: 'asc' }
+          orderBy: { order: 'asc' },
         },
         catalogs: true,
       },
@@ -84,16 +88,16 @@ export class ProductsService {
   // Create new product
   async create(createProductDto: CreateProductDto): Promise<Product> {
     const { image, ...productData } = createProductDto;
-    
+
     const data: any = { ...productData };
-    
+
     if (image) {
       data.images = {
         create: {
           url: image,
           alt: productData.name,
-          order: 0
-        }
+          order: 0,
+        },
       };
     }
 
@@ -102,7 +106,7 @@ export class ProductsService {
       include: {
         category: true,
         images: {
-          orderBy: { order: 'asc' }
+          orderBy: { order: 'asc' },
         },
         catalogs: true,
       },
@@ -110,7 +114,10 @@ export class ProductsService {
   }
 
   // Update product
-  async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
     // Check if product exists
     const existingProduct = await this.findOne(id);
     if (!existingProduct) {
@@ -127,12 +134,12 @@ export class ProductsService {
           create: {
             url: image,
             alt: productData.name || existingProduct.name,
-            order: 0
-          }
+            order: 0,
+          },
         };
       } else {
         data.images = {
-          deleteMany: {}
+          deleteMany: {},
         };
       }
     }
@@ -143,7 +150,7 @@ export class ProductsService {
       include: {
         category: true,
         images: {
-          orderBy: { order: 'asc' }
+          orderBy: { order: 'asc' },
         },
         catalogs: true,
       },
@@ -163,7 +170,7 @@ export class ProductsService {
       include: {
         category: true,
         images: {
-          orderBy: { order: 'asc' }
+          orderBy: { order: 'asc' },
         },
         catalogs: true,
       },
@@ -171,7 +178,11 @@ export class ProductsService {
   }
 
   // Get products by category
-  async findByCategory(categoryId: string, limit = 20, offset = 0): Promise<Product[]> {
+  async findByCategory(
+    categoryId: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<Product[]> {
     return this.prisma.product.findMany({
       where: { categoryId, published: true },
       take: limit,
@@ -197,13 +208,13 @@ export class ProductsService {
           { brand: { contains: query, mode: 'insensitive' } },
           { modelNumber: { contains: query, mode: 'insensitive' } },
           { tags: { has: query } },
-          { 
+          {
             category: {
               OR: [
                 { name: { contains: query, mode: 'insensitive' } },
                 { slug: { contains: query, mode: 'insensitive' } },
-              ]
-            }
+              ],
+            },
           },
         ],
       },
@@ -220,7 +231,7 @@ export class ProductsService {
   // Advanced search with specific filters
   async advancedSearch(filters: AdvancedSearchDto): Promise<Product[]> {
     const { name, sku, brand, category, limit = 20, offset = 0 } = filters;
-    
+
     const where: {
       published: boolean;
       name?: { contains: string; mode: 'insensitive' };
@@ -240,15 +251,15 @@ export class ProductsService {
     if (name) {
       where.name = { contains: name, mode: 'insensitive' };
     }
-    
+
     if (sku) {
       where.sku = { contains: sku, mode: 'insensitive' };
     }
-    
+
     if (brand) {
       where.brand = { contains: brand, mode: 'insensitive' };
     }
-    
+
     if (category) {
       where.category = {
         OR: [
@@ -269,5 +280,4 @@ export class ProductsService {
       },
     });
   }
-  
 }

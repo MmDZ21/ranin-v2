@@ -1,6 +1,7 @@
 import { CategoryForm } from "../../category-form"
 import { getCategory, getCategories } from "@/actions/dashboard/categories"
 import { notFound } from "next/navigation"
+import type { Category } from "@/types/category.types"
 
 interface EditCategoryPageProps {
   params: Promise<{ id: string }>
@@ -16,7 +17,7 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
   }
 
   // Filter out the current category to avoid selecting itself as parent (prevent cycles)
-  const availableCategories = categories.filter((c: any) => c.id !== id)
+  const availableCategories = categories.filter((c: Category) => c.id !== id)
 
   return (
     <div className="space-y-6">

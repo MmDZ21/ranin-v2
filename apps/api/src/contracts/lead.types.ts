@@ -21,5 +21,3 @@ export interface CreateLeadInput {
 }
 
 export type UpdateLeadInput = Partial<CreateLeadInput>;
-
-

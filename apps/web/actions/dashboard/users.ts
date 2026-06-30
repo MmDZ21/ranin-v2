@@ -59,7 +59,7 @@ export async function updateUser(id: string, data: UserFormValues) {
     }
 
     const res = await authFetch(`${API_URL}/users/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })

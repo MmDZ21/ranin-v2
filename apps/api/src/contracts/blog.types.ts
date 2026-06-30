@@ -42,5 +42,3 @@ export interface CreateBlogPostInput {
 }
 
 export type UpdateBlogPostInput = Partial<CreateBlogPostInput>;
-
-

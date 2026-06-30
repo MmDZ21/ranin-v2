@@ -6,11 +6,11 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', 'src/generated/**', 'dist/**'],
   },
-  // eslint.configs.recommended,
-  // ...tseslint.configs.recommendedTypeChecked,
-  // eslintPluginPrettierRecommended,
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  eslintPluginPrettierRecommended,
   {
     languageOptions: {
       globals: {

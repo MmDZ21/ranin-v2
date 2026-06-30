@@ -1,5 +1,36 @@
+import type { Metadata } from "next";
 import DirectionProvider from "@/components/layout/DirectionProvider";
 import "./globals.css";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const siteName = "رانین فرایند";
+const description =
+  "تأمین و عرضه رله‌های حفاظتی و تجهیزات حفاظت الکتریکی صنعتی برای پست‌ها و تابلوهای برق.";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: `${siteName} | تجهیزات حفاظت الکتریکی صنعتی`,
+    template: `%s | ${siteName}`,
+  },
+  description,
+  applicationName: siteName,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "fa_IR",
+    siteName,
+    url: siteUrl,
+    title: `${siteName} | تجهیزات حفاظت الکتریکی صنعتی`,
+    description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${siteName} | تجهیزات حفاظت الکتریکی صنعتی`,
+    description,
+  },
+  robots: { index: true, follow: true },
+};
 
 export default function RootLayout({
   children,
@@ -8,12 +39,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
-      <body
-        className={`antialiased`}
-      >
-        <DirectionProvider>
-          {children}
-        </DirectionProvider>
+      <body className="antialiased">
+        <DirectionProvider>{children}</DirectionProvider>
       </body>
     </html>
   );

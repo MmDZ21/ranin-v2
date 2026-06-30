@@ -6,14 +6,13 @@ import { ENCODED_KEY } from "./constants";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7;
+
 export async function createSession(payload: Session) {
-  console.log("[Session] Creating new session...");
   const decodedRefresh = decodeJwt(payload.refreshToken);
   const expiredAt = decodedRefresh.exp
     ? new Date(decodedRefresh.exp * 1000)
-    : new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
-
-  console.log(`[Session] Expiration set to: ${expiredAt.toISOString()}`);
+    : new Date(Date.now() + SEVEN_DAYS_MS);
 
   const session = await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -29,24 +28,20 @@ export async function createSession(payload: Session) {
     sameSite: "lax",
     path: "/",
   });
-  console.log("[Session] Session cookie set successfully.");
 }
 
 export async function getSession() {
   const cookieStore = await cookies();
   const jwtToken = cookieStore.get("session");
   if (!jwtToken) {
-    console.log("[Session] No session cookie found in getSession.");
     return null;
   }
   try {
-    const { payload } = await jwtVerify(jwtToken.value, ENCODED_KEY, {
+    const { payload } = await jwtVerify<Session>(jwtToken.value, ENCODED_KEY, {
       algorithms: ["HS256"],
     });
-    return payload as Session;
-  } catch (error) {
-    console.error("[Session] Error verifying session in getSession:", error);
-    // Don't log sensitive token information
+    return payload;
+  } catch {
     redirect("/auth/login");
   }
 }
@@ -72,13 +67,11 @@ export async function updateTokens({
 
   if (!payload) throw new Error("session not found");
 
-  const newPayload : Session= {
-    user : {
-      ...payload.user,
-    },
+  const newPayload: Session = {
+    user: { ...payload.user },
     accessToken,
-    refreshToken
-  }
+    refreshToken,
+  };
 
   await createSession(newPayload);
 }

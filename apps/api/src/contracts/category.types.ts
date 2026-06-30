@@ -30,5 +30,3 @@ export interface CreateCategoryInput {
 }
 
 export type UpdateCategoryInput = Partial<CreateCategoryInput>;
-
-

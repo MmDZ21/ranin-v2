@@ -1,12 +1,10 @@
 generator client {
   provider = "prisma-client"
   output   = "../src/generated"
-  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -15,7 +13,7 @@ model User {
   password           String
   hashedRefreshToken String?
   name               String?
-  role               Role     @default(ADMIN)
+  role               Role     @default(USER)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }

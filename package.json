@@ -1,5 +1,41 @@
 {
-	"dependencies": {
-
-	}
+  "name": "ranin-v2",
+  "version": "1.0.0",
+  "private": true,
+  "description": "E-commerce monorepo for industrial electrical protection relays (NestJS API + Next.js web).",
+  "packageManager": "pnpm@10.13.1",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "dev:api": "pnpm --filter ./apps/api start:dev",
+    "dev:web": "pnpm --filter ./apps/web dev",
+    "build": "pnpm -r build",
+    "build:api": "pnpm --filter ./apps/api build",
+    "build:web": "pnpm --filter ./apps/web build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm --filter ./apps/api test",
+    "format": "pnpm -r format",
+    "typecheck": "pnpm -r typecheck",
+    "prisma:generate": "pnpm --filter ./apps/api prisma:generate",
+    "db:migrate": "pnpm --filter ./apps/api exec prisma migrate dev",
+    "db:deploy": "pnpm --filter ./apps/api exec prisma migrate deploy",
+    "db:seed": "pnpm --filter ./apps/api exec prisma db seed"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "@tailwindcss/oxide",
+      "argon2",
+      "esbuild",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
 }

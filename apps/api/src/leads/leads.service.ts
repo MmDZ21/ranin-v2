@@ -2,16 +2,20 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
-import { ContactLead } from 'src/generated/client';
+import { ContactLead } from '../generated/client';
 
 @Injectable()
 export class LeadsService {
   constructor(private prisma: PrismaService) {}
 
   // Get all leads with optional filtering
-  async findAll(limit = 50, offset = 0, source?: string): Promise<ContactLead[]> {
+  async findAll(
+    limit = 50,
+    offset = 0,
+    source?: string,
+  ): Promise<ContactLead[]> {
     const where = source ? { source } : {};
-    
+
     return this.prisma.contactLead.findMany({
       where,
       take: limit,
@@ -23,8 +27,8 @@ export class LeadsService {
             id: true,
             name: true,
             slug: true,
-          }
-        }
+          },
+        },
       },
     });
   }
@@ -39,8 +43,8 @@ export class LeadsService {
             id: true,
             name: true,
             slug: true,
-          }
-        }
+          },
+        },
       },
     });
   }
@@ -55,8 +59,8 @@ export class LeadsService {
             id: true,
             name: true,
             slug: true,
-          }
-        }
+          },
+        },
       },
     });
   }
@@ -78,8 +82,8 @@ export class LeadsService {
             id: true,
             name: true,
             slug: true,
-          }
-        }
+          },
+        },
       },
     });
   }
@@ -100,8 +104,8 @@ export class LeadsService {
             id: true,
             name: true,
             slug: true,
-          }
-        }
+          },
+        },
       },
     });
   }
@@ -118,8 +122,8 @@ export class LeadsService {
             id: true,
             name: true,
             slug: true,
-          }
-        }
+          },
+        },
       },
     });
   }
@@ -136,8 +140,8 @@ export class LeadsService {
             id: true,
             name: true,
             slug: true,
-          }
-        }
+          },
+        },
       },
     });
   }
@@ -161,8 +165,8 @@ export class LeadsService {
             id: true,
             name: true,
             slug: true,
-          }
-        }
+          },
+        },
       },
     });
   }
@@ -173,23 +177,23 @@ export class LeadsService {
     const today = await this.prisma.contactLead.count({
       where: {
         createdAt: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0))
-        }
-      }
+          gte: new Date(new Date().setHours(0, 0, 0, 0)),
+        },
+      },
     });
     const thisWeek = await this.prisma.contactLead.count({
       where: {
         createdAt: {
-          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-        }
-      }
+          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
+      },
     });
     const thisMonth = await this.prisma.contactLead.count({
       where: {
         createdAt: {
-          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-        }
-      }
+          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        },
+      },
     });
 
     return {

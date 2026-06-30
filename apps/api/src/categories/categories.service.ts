@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Category } from 'src/generated/client';
+import { Category } from '../generated/client';
 
 @Injectable()
 export class CategoriesService {
@@ -48,8 +48,10 @@ export class CategoriesService {
     });
 
     // Filter to only root categories (no parent)
-    const roots = categories.filter(category => !category.parentId);
-    this.logger.log(`Fetched category tree: roots=${roots.length}, total=${categories.length}`);
+    const roots = categories.filter((category) => !category.parentId);
+    this.logger.log(
+      `Fetched category tree: roots=${roots.length}, total=${categories.length}`,
+    );
     return roots;
   }
 
@@ -116,7 +118,10 @@ export class CategoriesService {
   }
 
   // Update a category
-  async update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<Category> {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category> {
     // Check if category exists
     await this.findOne(id);
 
@@ -139,8 +144,12 @@ export class CategoriesService {
     });
 
     if (children.length > 0) {
-      this.logger.warn(`Blocked deletion for id=${id}: has ${children.length} child categories`);
-      throw new Error('Cannot delete category with children. Please delete or move children first.');
+      this.logger.warn(
+        `Blocked deletion for id=${id}: has ${children.length} child categories`,
+      );
+      throw new Error(
+        'Cannot delete category with children. Please delete or move children first.',
+      );
     }
 
     // Check if category has products
@@ -149,8 +158,12 @@ export class CategoriesService {
     });
 
     if (products.length > 0) {
-      this.logger.warn(`Blocked deletion for id=${id}: has ${products.length} products`);
-      throw new Error('Cannot delete category with products. Please move or delete products first.');
+      this.logger.warn(
+        `Blocked deletion for id=${id}: has ${products.length} products`,
+      );
+      throw new Error(
+        'Cannot delete category with products. Please move or delete products first.',
+      );
     }
 
     const deleted = await this.prisma.category.delete({

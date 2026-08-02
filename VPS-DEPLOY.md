@@ -10,7 +10,7 @@ Everything below is grounded in the actual code (file:line references included),
 
 ## 0. What the project actually is
 
-- **apps/api** (NestJS): builds with `nest build` (`prebuild`/`postinstall` run `prisma generate`) → `dist/main.js`, runs with `node dist/main`. Port from `PORT` (default 3333), global prefix `/api`. PostgreSQL via Prisma 7 (driver adapter + `pg` Pool). **No migration history → use `prisma db push`**.
+- **apps/api** (NestJS): builds with `nest build` (`prebuild`/`postinstall` run `prisma generate`) → `dist/main.js`, runs with `node dist/main`. Port from `PORT` (default 3333), global prefix `/api`. PostgreSQL via Prisma 7 (driver adapter + `pg` Pool). Migration history is tracked; deploy with `prisma migrate deploy`.
 - **apps/web** (Next 16): `next build` → `next start`, port 3000. `NEXT_PUBLIC_*` vars are **baked into the bundle at build time**.
 - **Storage**: S3-compatible (Liara) used only for admin image uploads.
 - **What's NOT there**: no payment gateway, no email/SMTP, no queues/cron/websockets, no other external APIs. So the VPS only needs: 2× Node + Postgres + Nginx + somewhere to keep images.
@@ -117,7 +117,9 @@ pnpm install --frozen-lockfile          # postinstall → prisma generate
 #   BACKEND_URL=http://127.0.0.1:3333/api    (server-side, internal & fast)
 #   SESSION_SECRET_KEY=<48 random bytes>
 
-pnpm --filter ./apps/api exec prisma db push   # no migration history → db push
+# If this populated database was previously managed with `prisma db push`,
+# complete the verified one-time baseline procedure in DEPLOY.md first.
+pnpm db:deploy
 pnpm --filter ./apps/api build
 pnpm --filter ./apps/web build
 
@@ -185,12 +187,13 @@ echo "0 3 * * * root /usr/local/bin/ranin-backup.sh" | sudo tee /etc/cron.d/rani
 
 ## 4. Other things to know / prevent before launch
 
-1. **🔴 `trust proxy` is not set — the biggest gotcha behind Nginx.** `apps/api/src/main.ts` has no `app.set('trust proxy', …)`. Behind Nginx, `req.ip` becomes Nginx's IP (127.0.0.1), and since the global `ThrottlerGuard` keys on IP, **all users are counted as one** → the 5/min login limit applies to the whole site and users lock each other out. One-line fix in `main.ts`:
+1. **🟡 Verify the proxy topology.** `apps/api/src/main.ts` currently sets one trusted proxy hop:
    ```ts
    app.set('trust proxy', 1); // behind one reverse proxy (Nginx)
    ```
+   Keep this only when exactly one trusted reverse proxy sits in front of the API; adjust it when the topology changes so throttling still sees the real client IP.
 2. **🔴 `env.validation.ts` requires `LIARA_*`** — on the filesystem path, if you don't remove those four, **the API won't boot**.
-3. **🔴 Rotate the committed live secrets.** `apps/api/.env` contains a **real `LIARA_ACCESS_KEY`/`LIARA_SECRET_KEY` + DB password**. Revoke/rotate the Liara key regardless of migration (it's exposed), and generate fresh secrets on the VPS:
+3. **🔴 Keep credentials out of Git and rotate deployment secrets.** Local `.env` files are ignored; confirm they stay untracked, use fresh production credentials, and rotate any credential that may previously have been exposed:
    ```bash
    node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
    ```
@@ -202,7 +205,7 @@ echo "0 3 * * * root /usr/local/bin/ranin-backup.sh" | sudo tee /etc/cron.d/rani
 8. **🟡 Don't ship these to the server**: a ~622 MB `apps.zip` at the repo root (not a runtime dependency, just weight) and a stale standalone build with a baked `.env` under `apps/web/.next/standalone/...`. Build fresh on the VPS.
 9. **🟡 Firewall**: only `80/443` public; keep `3000/3333/5432` (and `9000` if MinIO) bound to `127.0.0.1` (`ufw allow 80,443`).
 10. **🟡 Health check**: `GET /api/health` runs `SELECT 1` and returns 503 if the DB is down — wire it into pm2/Nginx monitoring (Liara did this automatically).
-11. **🟡 Prisma 7**: when running `db push`/`seed`, `DATABASE_URL` must be in the environment (the CLI no longer auto-loads `.env`; `prisma.config.ts` loads `dotenv`, so run these from inside `apps/api`).
+11. **🟡 Prisma 7**: when running `migrate deploy`/`seed`, `DATABASE_URL` must be in the environment (the CLI no longer auto-loads `.env`; `prisma.config.ts` loads `dotenv`, so run these from inside `apps/api`).
 
 ---
 
@@ -216,6 +219,6 @@ If you go with **filesystem + Nginx**, these are the in-repo edits (all on `apps
 4. Drop unused deps: `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`, `multer-s3` from `apps/api/package.json`.
 5. Remove the `liara.space` `remotePatterns` from `apps/web/next.config.ts` (same-origin relative URLs need none).
 6. Update `apps/api/.env.example` (drop `LIARA_*`, add `UPLOAD_DIR`).
-7. Add `app.set('trust proxy', 1);` in `apps/api/src/main.ts`.
+7. Verify that `app.set('trust proxy', 1)` matches the deployed reverse-proxy hop count.
 
-For the **MinIO path**: no code changes — set `LIARA_ENDPOINT`/keys/bucket to MinIO, make the bucket public-read, replace the `next.config.ts` image host, and still add the `trust proxy` line from §4.1.
+For the **MinIO path**: no code changes — set `LIARA_ENDPOINT`/keys/bucket to MinIO, make the bucket public-read, replace the `next.config.ts` image host, and verify the existing `trust proxy` setting against §4.1.

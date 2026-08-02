@@ -35,16 +35,44 @@ Required (validated at boot — the app fails fast if any are missing):
 
 ```bash
 pnpm db:up          # docker-compose Postgres on :5432
-pnpm db:migrate     # or: pnpm --filter ./apps/api exec prisma db push
+pnpm db:migrate
 pnpm db:seed
 ```
 
-This repo has no migration history yet, so production schema setup uses
-`prisma db push`:
+Production schema setup replays the tracked migration history:
 
 ```bash
-pnpm --filter ./apps/api exec prisma db push   # applies schema.prisma to the DB
+pnpm db:deploy
 ```
+
+### One-time baseline for databases created with `prisma db push`
+
+Do not run `migrate deploy` blindly against an existing populated database that
+has no `_prisma_migrations` history. Back it up first, point `DATABASE_URL` at a
+restored clone, and verify that its schema already matches this repository:
+
+```bash
+cd apps/api
+pnpm exec prisma migrate diff \
+  --from-config-datasource \
+  --to-schema prisma/schema.prisma \
+  --exit-code
+```
+
+Only when that command reports `No difference detected`, mark the five existing
+migrations as applied, then verify status:
+
+```bash
+pnpm exec prisma migrate resolve --applied 20250927083933_init
+pnpm exec prisma migrate resolve --applied 20250927113730_relations
+pnpm exec prisma migrate resolve --applied 20251008065334_add_category_image
+pnpm exec prisma migrate resolve --applied 20251122173634_change
+pnpm exec prisma migrate resolve --applied 20260803014040_align_schema_defaults_and_indexes
+pnpm exec prisma migrate status
+```
+
+If the diff is not empty, stop and reconcile the restored clone before marking
+anything applied. Never use `migrate resolve --applied` to hide real drift.
 
 > Prisma 7: the CLI no longer auto-loads `.env` and connection URLs are read
 > from `apps/api/prisma.config.ts` (which loads `dotenv`). Ensure `DATABASE_URL`
@@ -56,6 +84,7 @@ pnpm --filter ./apps/api exec prisma db push   # applies schema.prisma to the DB
 
 ```bash
 docker build -f apps/api/Dockerfile -t ranin-api .
+docker run --rm --env-file apps/api/.env ranin-api ./node_modules/.bin/prisma migrate deploy
 docker run -p 3333:3333 --env-file apps/api/.env ranin-api
 ```
 
@@ -64,7 +93,7 @@ docker run -p 3333:3333 --env-file apps/api/.env ranin-api
 ```bash
 pnpm install --frozen-lockfile       # runs prisma generate via postinstall
 pnpm --filter ./apps/api build
-pnpm --filter ./apps/api exec prisma db push
+pnpm db:deploy
 NODE_ENV=production node apps/api/dist/main
 ```
 

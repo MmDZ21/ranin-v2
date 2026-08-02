@@ -9,6 +9,7 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user-dto';
+import { LoginDto } from './dto/login.dto';
 import { LocalAuthGuard } from './guards/local-auth/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
 import { RefreshAuthGuard } from './guards/refresh-auth/refresh-auth.guard';
@@ -30,7 +31,10 @@ export class AuthController {
   @Throttle(AUTH_THROTTLE)
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Request() req) {
+  // LocalAuthGuard validates LoginDto before Passport. Keeping the body
+  // parameter also documents the controller contract for Nest and Swagger.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  login(@Request() req, @Body() loginDto: LoginDto) {
     return this.authService.login(
       req.user.id,
       req.user.email,

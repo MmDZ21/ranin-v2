@@ -22,14 +22,14 @@ From the repo root:
 - `pnpm test` — API Jest tests
 - `pnpm db:migrate` (dev) / `pnpm db:deploy` (prod) / `pnpm db:seed`
 
-From `apps/api`: `pnpm start:dev`, `pnpm test` (single: `pnpm test -- -t "name"` or a spec path), `pnpm test:e2e` (needs a DB), `pnpm lint` (eslint `--fix`), `pnpm build` (runs `prisma generate` via `prebuild`).
+From `apps/api`: `pnpm start:dev`, `pnpm test` (single: `pnpm test -- -t "name"` or a spec path), `pnpm test:e2e` (needs a DB), `pnpm lint` (check only), `pnpm lint:fix`, `pnpm build` (runs `prisma generate` via `prebuild`).
 
 From `apps/web`: `pnpm dev` / `pnpm build` (Turbopack, default in Next 16), `pnpm lint`, `pnpm typecheck`, `pnpm test` (Vitest).
 
 ## Prisma (api)
 
 - The client is generated to `apps/api/src/generated` and imported with **relative paths** (e.g. `import { Product } from '../generated/client'`, enums from `'../generated/enums'`). The directory is gitignored and regenerated via the `postinstall`/`prebuild` `prisma generate` step.
-- **Prisma 7 specifics:** config lives in `apps/api/prisma.config.ts` (schema path, seed command, datasource URL). The CLI no longer auto-loads `.env` — `prisma.config.ts` imports `dotenv/config`. The datasource `url` is **not** in `schema.prisma` (it's in the config); the runtime connects via the `@prisma/adapter-pg` driver adapter in `src/prisma/prisma.service.ts`. `driverAdapters` is GA (no preview flag). No migration history yet — use `prisma db push`.
+- **Prisma 7 specifics:** config lives in `apps/api/prisma.config.ts` (schema path, seed command, datasource URL). The CLI no longer auto-loads `.env` — `prisma.config.ts` imports `dotenv/config`. The datasource `url` is **not** in `schema.prisma` (it's in the config); the runtime connects via the `@prisma/adapter-pg` driver adapter in `src/prisma/prisma.service.ts`. `driverAdapters` is GA (no preview flag). Migration history is tracked under `prisma/migrations`; use `prisma migrate dev` locally and `prisma migrate deploy` in production.
 
 ## Auth
 

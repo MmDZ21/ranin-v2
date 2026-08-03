@@ -15,6 +15,12 @@ export interface CatalogFile {
   mimeType?: string | null;
 }
 
+export interface ProductCategory {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export interface Product {
   id: string;
   sku?: string | null;
@@ -25,6 +31,7 @@ export interface Product {
   brand?: string | null;
   modelNumber?: string | null;
   categoryId?: string | null;
+  category?: ProductCategory | null;
   specs?: Record<string, string> | null;
   tags: string[];
   features: string[];
@@ -62,5 +69,4 @@ export interface CreateProductInput {
 }
 
 export type UpdateProductInput = Partial<CreateProductInput>;
-
 

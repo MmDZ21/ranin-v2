@@ -1,71 +1,52 @@
-import { Product } from "@/types/product.types";
-import Image from "next/image";
+import type { Product } from "@/types/product.types";
 import Link from "next/link";
-import React from "react";
-import { Phone, ExternalLink } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+
+import { ProductMedia } from "@/components/ui/ProductMedia";
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="group relative bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-100/50 transition-all duration-300 hover:-translate-y-1">
-      <Link href={`/products/${product.slug}`} className="block">
+    <article className="group relative overflow-hidden rounded-2xl border border-border bg-card transition-colors duration-200 hover:border-primary/40">
+      <Link
+        href={`/products/${product.slug}`}
+        className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
         {/* Image Container */}
-        <div className="relative w-full bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-          <div className="aspect-square flex items-center justify-center p-4 sm:p-6">
-            {product.images && product.images.length > 0 ? (
-              <Image
-                src={product.images[0].url}
-                alt={product.name}
-                className="object-contain w-full h-full group-hover:scale-105 transition-transform duration-300"
-                width={300}
-                height={300}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center text-gray-300">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-2">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <span className="text-xs text-gray-600">بدون تصویر</span>
-              </div>
-            )}
-          </div>
-          
-          {/* Hover Overlay */}
-          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          
-          {/* External Link Icon */}
-          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm">
-              <ExternalLink className="w-4 h-4 text-muted-foreground" />
-            </div>
-          </div>
+        <div className="relative aspect-square w-full overflow-hidden bg-muted">
+          <ProductMedia
+            src={product.images?.[0]?.url}
+            alt={product.images?.[0]?.alt || product.name}
+            label={product.sku ?? product.modelNumber}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            imageClassName="p-5 transition-transform duration-300 ease-out group-hover:scale-[1.03] sm:p-7"
+          />
         </div>
 
         {/* Content */}
         <div className="p-4 sm:p-5">
           <div className="space-y-2">
-            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight group-hover:text-primary transition-colors duration-200 line-clamp-1">
+            <h3 className="min-h-10 line-clamp-2 text-sm font-semibold leading-5 text-foreground transition-colors duration-200 group-hover:text-primary sm:text-base">
               {product.name}
             </h3>
             
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 font-mono bg-gray-50 px-2 py-1 rounded-md">
+              <span
+                className="rounded-md bg-muted px-2 py-1 font-mono text-xs text-muted-foreground"
+                dir="ltr"
+              >
                 {product.sku ?? product.modelNumber ?? product.slug}
               </span>
             </div>
           </div>
 
-          {/* Contact Button */}
-          <div className="mt-4 pt-3 border-t border-gray-50">
-            <div className="flex items-center justify-center gap-2 text-primary text-sm font-medium group-hover:bg-primary/5 rounded-lg py-2 transition-colors duration-200">
-              <Phone className="w-4 h-4" />
-              <span>تماس بگیرید</span>
+          <div className="mt-4 border-t border-border pt-3">
+            <div className="flex min-h-11 items-center justify-between rounded-lg px-2 text-sm font-medium text-primary transition-colors duration-200 group-hover:bg-primary/[0.06]">
+              <span>مشاهده مشخصات</span>
+              <ArrowLeft className="size-4 transition-transform duration-200 group-hover:-translate-x-1" />
             </div>
           </div>
         </div>
       </Link>
-    </div>
+    </article>
   );
 }

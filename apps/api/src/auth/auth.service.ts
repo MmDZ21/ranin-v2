@@ -2,6 +2,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -67,11 +68,22 @@ export class AuthService {
   }
 
   async validateJwtUser(userId: string) {
-    const user = await this.userService.findById(userId);
-    if (!user) {
-      throw new UnauthorizedException('User not found');
+    // findById throws NotFoundException for an unknown id (e.g. a user deleted
+    // after their access token was issued) — that's a 401 here, not a 404.
+    try {
+      const user = await this.userService.findById(userId);
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      };
+    } catch (err) {
+      if (err instanceof NotFoundException) {
+        throw new UnauthorizedException('User not found');
+      }
+      throw err;
     }
-    return { id: user.id, email: user.email, name: user.name, role: user.role };
   }
 
   async validateRefreshToken(userId: string, refreshToken?: string) {

@@ -1,17 +1,25 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const config = app.get(ConfigService);
-  const logger = new Logger('Bootstrap');
+export async function createApplication({
+  enableShutdownHooks = true,
+}: { enableShutdownHooks?: boolean } = {}) {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  // Trust the first hop (nginx/Liara/etc reverse proxy) so Express derives
+  // req.ip from X-Forwarded-For instead of the proxy's socket address.
+  // Without this, ThrottlerGuard keys on a single shared IP for all clients.
+  // Adjust the hop count if the deploy topology adds/removes proxies.
+  app.set('trust proxy', 1);
+
+  const config = app.get(ConfigService);
   app.setGlobalPrefix('api');
 
   // Security headers. CSP is disabled because this is a JSON API (and so the
@@ -45,7 +53,9 @@ async function bootstrap() {
   });
 
   // Run onModuleDestroy (pg pool drain) on SIGTERM/SIGINT.
-  app.enableShutdownHooks();
+  if (enableShutdownHooks) {
+    app.enableShutdownHooks();
+  }
 
   if (config.get<string>('NODE_ENV') !== 'production') {
     const swaggerConfig = new DocumentBuilder()
@@ -60,9 +70,18 @@ async function bootstrap() {
     SwaggerModule.setup('api/docs', app, document);
   }
 
+  return app;
+}
+
+async function bootstrap() {
+  const app = await createApplication();
+  const config = app.get(ConfigService);
+  const logger = new Logger('Bootstrap');
   const port = config.get<number>('PORT') ?? 3333;
   await app.listen(port);
   logger.log(`API listening on http://localhost:${port}/api`);
 }
 
-void bootstrap();
+if (require.main === module) {
+  void bootstrap();
+}

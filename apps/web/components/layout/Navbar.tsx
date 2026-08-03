@@ -45,8 +45,8 @@ export default function NavBar(props: NavBarConfig) {
               {(props.items ?? []).map((item, idx) => (
                 <NavigationMenuItem key={idx}>
                   {item.href ? (
-                    <NavigationMenuLink href={item.href} className="rounded-sm p-2 text-foreground hover:bg-primary">
-                      {item.label}
+                    <NavigationMenuLink asChild className="rounded-sm p-2 text-foreground hover:bg-primary">
+                      <Link href={item.href}>{item.label}</Link>
                     </NavigationMenuLink>
                   ) : (
                     <>
@@ -62,10 +62,10 @@ export default function NavBar(props: NavBarConfig) {
                                 <ul className="space-y-3">
                                   {column.links.map((link, linkIdx) => (
                                     <li key={linkIdx}>
-                                      <a href={link.href} className="group block rounded-lg p-3 transition-colors duration-200 hover:bg-primary">
+                                      <Link href={link.href} className="group block rounded-lg p-3 transition-colors duration-200 hover:bg-primary">
                                         <div className="mb-1 font-medium text-foreground group-hover:text-primary-foreground">{link.label}</div>
                                         {link.description && <div className="text-sm text-muted-foreground group-hover:text-primary-foreground/80">{link.description}</div>}
-                                      </a>
+                                      </Link>
                                     </li>
                                   ))}
                                 </ul>
@@ -88,9 +88,11 @@ export default function NavBar(props: NavBarConfig) {
           <SearchModal />
           
           {/* Sign In Button */}
-          <Button variant="default" className="gap-2">
-            <LogInIcon className="h-4 w-4" /> 
-            ورود
+          <Button asChild variant="default" className="gap-2">
+            <Link href="/auth/login">
+              <LogInIcon className="h-4 w-4" />
+              ورود
+            </Link>
           </Button>
         </div>
 
@@ -116,9 +118,11 @@ export default function NavBar(props: NavBarConfig) {
             
             {/* Mobile Actions */}
             <div className="flex items-center justify-between">
-              <Button variant="ghost" className="gap-2 flex-1 justify-start">
-                <LogInIcon className="h-4 w-4" /> 
-                ورود
+              <Button asChild variant="ghost" className="gap-2 flex-1 justify-start">
+                <Link href="/auth/login" onClick={() => setIsMobileMenuOpen(false)}>
+                  <LogInIcon className="h-4 w-4" />
+                  ورود
+                </Link>
               </Button>
               
             </div>
@@ -129,13 +133,13 @@ export default function NavBar(props: NavBarConfig) {
               {(props.items ?? []).map((item, idx) => (
                 <div key={idx} className="border-b border-border/50 last:border-b-0">
                   {item.href ? (
-                    <a 
-                      href={item.href} 
-                      className="flex items-center px-3 py-4 text-foreground hover:bg-muted/50 transition-colors duration-200 rounded-lg mx-1 my-1" 
+                    <Link
+                      href={item.href}
+                      className="flex items-center px-3 py-4 text-foreground hover:bg-muted/50 transition-colors duration-200 rounded-lg mx-1 my-1"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <span className="font-medium">{item.label}</span>
-                    </a>
+                    </Link>
                   ) : (
                     <div>
                       <button
@@ -163,7 +167,7 @@ export default function NavBar(props: NavBarConfig) {
                               </h4>
                               <div className="space-y-1">
                                 {column.links.map((link, linkIdx) => (
-                                  <a
+                                  <Link
                                     key={linkIdx}
                                     href={link.href}
                                     className="flex flex-col px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors duration-200 rounded-md mx-1"
@@ -175,7 +179,7 @@ export default function NavBar(props: NavBarConfig) {
                                         {link.description}
                                       </span>
                                     )}
-                                  </a>
+                                  </Link>
                                 ))}
                               </div>
                             </div>

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Globe, Phone } from 'lucide-react'
+import { Phone } from 'lucide-react'
 import { Container } from '../ui/Container'
 import { TopBarConfig } from '@/constants'
 
@@ -14,13 +14,6 @@ export async function TopBar(props: TopBarConfig) {
         </div>
 
         <div className="flex items-center gap-3">
-          {props.showLanguage && (
-            <button className="flex items-center gap-1 hover:opacity-80 transition">
-              <Globe className="h-4 w-4" />
-              <span>{props.languageLabel}</span>
-            </button>
-          )}
-
           {props.showContact && (
             <a
               href={props.contactHref ?? "#"}

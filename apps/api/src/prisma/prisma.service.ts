@@ -19,6 +19,12 @@ export class PrismaService
 
     const pool = new Pool({
       connectionString,
+      // Explicit pool sizing/timeouts so behavior is intentional rather than
+      // implicit defaults: cap concurrent connections, recycle idle ones, and
+      // fail fast if a connection can't be acquired.
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
     });
     const adapter = new PrismaPg(pool);
     super({ adapter });

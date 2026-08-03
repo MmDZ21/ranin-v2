@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/Button"
+import { Card, CardBody, CardHeader } from "@/components/ui/Card"
 import {
   Form,
   FormControl,
@@ -71,7 +72,7 @@ export function ProductForm({ initialData, productId, categories }: ProductFormP
   async function onSubmit(values: ProductFormValues) {
     setLoading(true)
     setError(null)
-    
+
     try {
       let result
       if (productId) {
@@ -81,13 +82,13 @@ export function ProductForm({ initialData, productId, categories }: ProductFormP
       }
 
       if (!result.success) {
-        setError(result.error || "An error occurred")
+        setError(result.error || "خطایی رخ داد")
         return
       }
 
       router.push("/dashboard/products")
     } catch (err) {
-      setError("Something went wrong")
+      setError("مشکلی پیش آمد. دوباره تلاش کنید.")
       console.error(err)
     } finally {
       setLoading(false)
@@ -96,304 +97,338 @@ export function ProductForm({ initialData, productId, categories }: ProductFormP
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-4xl">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-4xl space-y-6">
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span className="block sm:inline">{error}</span>
+          <div
+            role="alert"
+            className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            {error}
           </div>
         )}
-        
-        <FormField
-          control={form.control}
-          name="image"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>تصویر محصول</FormLabel>
-              <FormControl>
-                <ImageUpload 
-                    value={field.value} 
-                    onChange={field.onChange} 
-                    disabled={loading} 
-                    label="آپلود تصویر محصول"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <h3 className="font-semibold text-foreground">اطلاعات اصلی</h3>
+          </CardHeader>
+          <CardBody className="space-y-6">
             <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
+              control={form.control}
+              name="image"
+              render={({ field }) => (
                 <FormItem>
-                <FormLabel>نام محصول</FormLabel>
-                <FormControl>
-                    <Input placeholder="نام محصول را وارد کنید" {...field} />
-                </FormControl>
-                <FormMessage />
+                  <FormLabel>تصویر محصول</FormLabel>
+                  <FormControl>
+                    <ImageUpload
+                      value={field.value}
+                      onChange={field.onChange}
+                      disabled={loading}
+                      label="آپلود تصویر محصول"
+                    />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
-            )}
-            />
-            
-            <FormField
-            control={form.control}
-            name="slug"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>نامک (Slug)</FormLabel>
-                <FormControl>
-                    <Input placeholder="product-slug" {...field} />
-                </FormControl>
-                <FormDescription>
-                    نامک در آدرس URL استفاده می‌شود.
-                </FormDescription>
-                <FormMessage />
-                </FormItem>
-            )}
+              )}
             />
 
-            <FormField
-            control={form.control}
-            name="sku"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>SKU (کد محصول)</FormLabel>
-                <FormControl>
-                    <Input placeholder="SKU-12345" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-
-            <FormField
-            control={form.control}
-            name="modelNumber"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>شماره مدل</FormLabel>
-                <FormControl>
-                    <Input placeholder="Model-X" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-
-            <FormField
-            control={form.control}
-            name="brand"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>برند</FormLabel>
-                <FormControl>
-                    <Input placeholder="نام برند" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-
-            <FormField
-            control={form.control}
-            name="categoryId"
-            render={({ field }) => (
-                <FormItem className="flex flex-col">
-                <FormLabel>دسته‌بندی</FormLabel>
-                <Popover>
-                    <PopoverTrigger asChild>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>نام محصول</FormLabel>
                     <FormControl>
-                        <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                            "w-full justify-between",
-                            !field.value && "text-muted-foreground"
-                        )}
-                        >
-                        {field.value
-                            ? categories.find(
-                                (category) => category.id === field.value
-                            )?.name
-                            : "انتخاب دسته‌بندی"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
+                      <Input placeholder="نام محصول را وارد کنید" {...field} />
                     </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                        <CommandInput placeholder="جستجوی دسته‌بندی..." />
-                        <CommandList>
-                        <CommandEmpty>دسته‌بندی یافت نشد.</CommandEmpty>
-                        <CommandGroup>
-                            {categories.map((category) => (
-                            <CommandItem
-                                value={category.name}
-                                key={category.id}
-                                onSelect={() => {
-                                form.setValue("categoryId", category.id)
-                                }}
-                            >
-                                <Check
-                                className={cn(
-                                    "mr-2 h-4 w-4",
-                                    category.id === field.value
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                                />
-                                {category.name}
-                            </CommandItem>
-                            ))}
-                        </CommandGroup>
-                        </CommandList>
-                    </Command>
-                    </PopoverContent>
-                </Popover>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-        </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <FormField
-          control={form.control}
-          name="shortDesc"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>توضیحات کوتاه</FormLabel>
-              <FormControl>
-                <Textarea placeholder="توضیحات مختصر محصول..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>نامک (Slug)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="product-slug" {...field} />
+                    </FormControl>
+                    <FormDescription>نامک در آدرس URL استفاده می‌شود.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <FormField
-          control={form.control}
-          name="longDesc"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>توضیحات کامل</FormLabel>
-              <FormControl>
-                <Textarea className="min-h-[150px]" placeholder="توضیحات کامل محصول..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+              <FormField
+                control={form.control}
+                name="sku"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SKU (کد محصول)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="SKU-12345" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="modelNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>شماره مدل</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Model-X" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="brand"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>برند</FormLabel>
+                    <FormControl>
+                      <Input placeholder="نام برند" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="categoryId"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>دسته‌بندی</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? categories.find(
+                                  (category) => category.id === field.value
+                                )?.name
+                              : "انتخاب دسته‌بندی"}
+                            <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[220px] p-0">
+                        <Command>
+                          <CommandInput placeholder="جستجوی دسته‌بندی..." />
+                          <CommandList>
+                            <CommandEmpty>دسته‌بندی یافت نشد.</CommandEmpty>
+                            <CommandGroup>
+                              {categories.map((category) => (
+                                <CommandItem
+                                  value={category.name}
+                                  key={category.id}
+                                  onSelect={() => {
+                                    form.setValue("categoryId", category.id)
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "size-4",
+                                      category.id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {category.name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <h3 className="font-semibold text-foreground">توضیحات</h3>
+          </CardHeader>
+          <CardBody className="space-y-6">
             <FormField
-            control={form.control}
-            name="features"
-            render={({ field }) => (
+              control={form.control}
+              name="shortDesc"
+              render={({ field }) => (
                 <FormItem>
-                <FormLabel>ویژگی‌ها (با ویرگول جدا کنید)</FormLabel>
-                <FormControl>
+                  <FormLabel>توضیحات کوتاه</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="توضیحات مختصر محصول..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="longDesc"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>توضیحات کامل</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      className="min-h-[150px]"
+                      placeholder="توضیحات کامل محصول..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <h3 className="font-semibold text-foreground">ویژگی‌ها و تگ‌ها</h3>
+          </CardHeader>
+          <CardBody className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="features"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>ویژگی‌ها (با ویرگول جدا کنید)</FormLabel>
+                  <FormControl>
                     <Input placeholder="ویژگی ۱, ویژگی ۲, ..." {...field} />
-                </FormControl>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {field.value && typeof field.value === 'string' && field.value.split(',').map((feature, index) => {
-                    const trimmed = feature.trim()
-                    if (!trimmed) return null
-                    return (
-                      <span key={index} className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                        {trimmed}
-                      </span>
-                    )
-                  })}
-                </div>
-                <FormMessage />
+                  </FormControl>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {field.value && typeof field.value === "string" &&
+                      field.value.split(",").map((feature, index) => {
+                        const trimmed = feature.trim()
+                        if (!trimmed) return null
+                        return (
+                          <span
+                            key={index}
+                            className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20"
+                          >
+                            {trimmed}
+                          </span>
+                        )
+                      })}
+                  </div>
+                  <FormMessage />
                 </FormItem>
-            )}
+              )}
             />
 
             <FormField
-            control={form.control}
-            name="tags"
-            render={({ field }) => (
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
                 <FormItem>
-                <FormLabel>تگ‌ها (با ویرگول جدا کنید)</FormLabel>
-                <FormControl>
+                  <FormLabel>تگ‌ها (با ویرگول جدا کنید)</FormLabel>
+                  <FormControl>
                     <Input placeholder="تگ ۱, تگ ۲, ..." {...field} />
-                </FormControl>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {field.value && typeof field.value === 'string' && field.value.split(',').map((tag, index) => {
-                    const trimmed = tag.trim()
-                    if (!trimmed) return null
-                    return (
-                      <span key={index} className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                        {trimmed}
-                      </span>
-                    )
-                  })}
-                </div>
-                <FormMessage />
+                  </FormControl>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {field.value && typeof field.value === "string" &&
+                      field.value.split(",").map((tag, index) => {
+                        const trimmed = tag.trim()
+                        if (!trimmed) return null
+                        return (
+                          <span
+                            key={index}
+                            className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground ring-1 ring-inset ring-border"
+                          >
+                            {trimmed}
+                          </span>
+                        )
+                      })}
+                  </div>
+                  <FormMessage />
                 </FormItem>
-            )}
+              )}
             />
-        </div>
+          </CardBody>
+        </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <h3 className="font-semibold text-foreground">بهینه‌سازی برای موتور جستجو (سئو)</h3>
+          </CardHeader>
+          <CardBody className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <FormField
-            control={form.control}
-            name="metaTitle"
-            render={({ field }) => (
+              control={form.control}
+              name="metaTitle"
+              render={({ field }) => (
                 <FormItem>
-                <FormLabel>عنوان سئو (Meta Title)</FormLabel>
-                <FormControl>
+                  <FormLabel>عنوان سئو (Meta Title)</FormLabel>
+                  <FormControl>
                     <Input placeholder="عنوان سئو" {...field} />
-                </FormControl>
-                <FormMessage />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
-            )}
+              )}
             />
 
             <FormField
-            control={form.control}
-            name="metaDescription"
-            render={({ field }) => (
+              control={form.control}
+              name="metaDescription"
+              render={({ field }) => (
                 <FormItem>
-                <FormLabel>توضیحات سئو (Meta Description)</FormLabel>
-                <FormControl>
+                  <FormLabel>توضیحات سئو (Meta Description)</FormLabel>
+                  <FormControl>
                     <Input placeholder="توضیحات سئو" {...field} />
-                </FormControl>
-                <FormMessage />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
-            )}
+              )}
             />
-        </div>
+          </CardBody>
+        </Card>
 
         <FormField
           control={form.control}
           name="published"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <FormItem className="flex flex-row items-center justify-between rounded-xl border bg-card p-4 shadow-theme-sm">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">انتشار</FormLabel>
-                <FormDescription>
-                  آیا این محصول در سایت نمایش داده شود؟
-                </FormDescription>
+                <FormDescription>آیا این محصول در سایت نمایش داده شود؟</FormDescription>
               </div>
               <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
             </FormItem>
           )}
         />
-        
-        <div className="flex gap-4">
-            <Button type="submit" disabled={loading}>
-              {loading ? "در حال ذخیره..." : "ذخیره تغییرات"}
-            </Button>
-            <Button type="button" variant="outline" onClick={() => router.back()}>انصراف</Button>
+
+        <div className="flex gap-3">
+          <Button type="submit" disabled={loading}>
+            {loading ? "در حال ذخیره..." : "ذخیره تغییرات"}
+          </Button>
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            انصراف
+          </Button>
         </div>
       </form>
     </Form>

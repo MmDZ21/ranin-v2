@@ -1,4 +1,5 @@
 import { CategoryForm } from "../../category-form"
+import { PageHeader } from "@/components/dashboard/page-header"
 import { getCategory, getCategories } from "@/actions/dashboard/categories"
 import { notFound } from "next/navigation"
 import type { Category } from "@/types/category.types"
@@ -21,9 +22,7 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">ویرایش دسته‌بندی</h2>
-      </div>
+      <PageHeader title="ویرایش دسته‌بندی" description="اطلاعات این دسته‌بندی را به‌روزرسانی کنید" />
       <CategoryForm initialData={category} categoryId={id} categories={availableCategories} />
     </div>
   )

@@ -13,7 +13,6 @@ import {
 import Link from "next/link"
 import { deleteCategory } from "@/actions/dashboard/categories"
 import { useTransition } from "react"
-import { useRouter } from "next/navigation"
 
 export type Category = {
   id: string
@@ -24,16 +23,13 @@ export type Category = {
 
 const ActionsCell = ({ category }: { category: Category }) => {
   const [isPending, startTransition] = useTransition()
-  const router = useRouter()
 
   const handleDelete = () => {
     if (confirm("آیا از حذف این دسته‌بندی اطمینان دارید؟")) {
       startTransition(async () => {
         const result = await deleteCategory(category.id)
-        if (result.success) {
-            // Success
-        } else {
-            alert("خطا در حذف دسته‌بندی")
+        if (!result.success) {
+          alert("خطا در حذف دسته‌بندی")
         }
       })
     }
@@ -42,24 +38,24 @@ const ActionsCell = ({ category }: { category: Category }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
+        <Button variant="ghost" className="size-8 p-0">
+          <span className="sr-only">باز کردن منو</span>
+          <MoreHorizontal className="size-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>عملیات</DropdownMenuLabel>
         <DropdownMenuItem asChild>
-            <Link href={`/dashboard/categories/${category.id}/edit`} className="flex w-full items-center cursor-pointer">
-                <Pencil className="ml-2 h-4 w-4" /> ویرایش
-            </Link>
+          <Link href={`/dashboard/categories/${category.id}/edit`} className="cursor-pointer">
+            <Pencil className="size-4" /> ویرایش
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem 
-            className="text-red-600 cursor-pointer focus:text-red-600 focus:bg-red-50"
-            onClick={handleDelete}
-            disabled={isPending}
+        <DropdownMenuItem
+          className="cursor-pointer text-destructive focus:text-destructive"
+          onClick={handleDelete}
+          disabled={isPending}
         >
-          <Trash className="ml-2 h-4 w-4" /> {isPending ? "در حال حذف..." : "حذف"}
+          <Trash className="size-4" /> {isPending ? "در حال حذف..." : "حذف"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -76,7 +72,7 @@ export const columns: ColumnDef<Category>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           نام دسته‌بندی
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="size-4" />
         </Button>
       )
     },

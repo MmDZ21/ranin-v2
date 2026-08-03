@@ -1,8 +1,16 @@
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { ContactHero } from "@/components/pages/contact/ContactHero";
 import { ContactForm } from "@/components/pages/contact/ContactForm";
 import { ContactInfo } from "@/components/pages/contact/ContactInfo";
 // import { ContactMap } from "@/components/pages/contact/ContactMap";
+
+export const metadata: Metadata = {
+  title: "تماس با ما",
+  description:
+    "برای استعلام قیمت، مشاوره فنی و سفارش رله‌های حفاظتی و تجهیزات حفاظت الکتریکی صنعتی با تیم رانین فرایند در تماس باشید.",
+  alternates: { canonical: "/contact" },
+};
 
 export default function ContactPage() {
   return (

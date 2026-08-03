@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import DirectionProvider from "@/components/layout/DirectionProvider";
 import "./globals.css";
+
+const iranSans = localFont({
+  src: [
+    { path: "../public/fonts/IranSansRegular.ttf", weight: "400", style: "normal" },
+    { path: "../public/fonts/IranSansBold.ttf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-iran-sans",
+  display: "swap",
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const siteName = "رانین فرایند";
@@ -39,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
-      <body className="antialiased">
+      <body className={`${iranSans.variable} antialiased`}>
         <DirectionProvider>{children}</DirectionProvider>
       </body>
     </html>

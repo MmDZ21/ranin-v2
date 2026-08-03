@@ -52,6 +52,7 @@ export default function ProductImages({
                         alt={image.alt ?? ""}
                         className="block h-full w-full object-contain"
                         fill
+                        sizes="(max-width: 1024px) 100vw, 50vw"
                       />
                     </div>
                   </SwiperSlide>
@@ -95,6 +96,7 @@ export default function ProductImages({
                       alt={image.alt ?? ""}
                       className="block h-full w-full object-contain"
                       fill
+                      sizes="(max-width: 1024px) 25vw, 13vw"
                     />
                   </button>
                 </SwiperSlide>

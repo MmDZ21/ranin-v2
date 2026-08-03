@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -125,6 +131,33 @@ export class CategoriesService {
     // Check if category exists
     await this.findOne(id);
 
+    if (updateCategoryDto.parentId) {
+      if (updateCategoryDto.parentId === id) {
+        throw new BadRequestException('A category cannot be its own parent.');
+      }
+
+      // Walk the ancestor chain of the proposed parent to guard against
+      // creating a cycle (the new parent cannot be a descendant of id)
+      let currentId: string | null = updateCategoryDto.parentId;
+      let depth = 0;
+      while (currentId && depth < 50) {
+        if (currentId === id) {
+          throw new BadRequestException(
+            'Cannot set parent: the selected category is a descendant of this category.',
+          );
+        }
+
+        const parent: Pick<Category, 'parentId'> | null =
+          await this.prisma.category.findUnique({
+            where: { id: currentId },
+            select: { parentId: true },
+          });
+
+        currentId = parent?.parentId ?? null;
+        depth++;
+      }
+    }
+
     const updated = await this.prisma.category.update({
       where: { id },
       data: updateCategoryDto,
@@ -139,29 +172,29 @@ export class CategoriesService {
     await this.findOne(id);
 
     // Check if category has children
-    const children = await this.prisma.category.findMany({
+    const childrenCount = await this.prisma.category.count({
       where: { parentId: id },
     });
 
-    if (children.length > 0) {
+    if (childrenCount > 0) {
       this.logger.warn(
-        `Blocked deletion for id=${id}: has ${children.length} child categories`,
+        `Blocked deletion for id=${id}: has ${childrenCount} child categories`,
       );
-      throw new Error(
+      throw new ConflictException(
         'Cannot delete category with children. Please delete or move children first.',
       );
     }
 
     // Check if category has products
-    const products = await this.prisma.product.findMany({
+    const productsCount = await this.prisma.product.count({
       where: { categoryId: id },
     });
 
-    if (products.length > 0) {
+    if (productsCount > 0) {
       this.logger.warn(
-        `Blocked deletion for id=${id}: has ${products.length} products`,
+        `Blocked deletion for id=${id}: has ${productsCount} products`,
       );
-      throw new Error(
+      throw new ConflictException(
         'Cannot delete category with products. Please move or delete products first.',
       );
     }

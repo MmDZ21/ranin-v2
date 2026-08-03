@@ -1,4 +1,5 @@
 import { PostForm } from "../../post-form"
+import { PageHeader } from "@/components/dashboard/page-header"
 import { getPost } from "@/actions/dashboard/blog"
 import { notFound } from "next/navigation"
 
@@ -16,9 +17,7 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">ویرایش نوشته</h2>
-      </div>
+      <PageHeader title="ویرایش نوشته" description="این نوشته وبلاگ را به‌روزرسانی کنید" />
       <PostForm initialData={post} postId={id} />
     </div>
   )

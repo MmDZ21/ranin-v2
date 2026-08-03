@@ -1,9 +1,8 @@
 "use client"
 
 import * as React from "react"
-import {
-  Command,
-} from "lucide-react"
+import Link from "next/link"
+import { ShieldCheck } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
@@ -18,30 +17,31 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
 import { sidebarItems } from "@/constants"
+import type { Session } from "@/lib/types"
 
-// Sample user data - typically this would come from auth context
-const userData = {
-  name: "Admin",
-  email: "admin@example.com",
-  avatar: "/avatars/admin.jpg",
-}
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  user,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { user: Session["user"] }) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="border-b border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="/dashboard">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
+            <SidebarMenuButton size="lg" asChild className="hover:bg-sidebar-accent">
+              <Link href="/dashboard">
+                <div className="flex aspect-square size-9 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shadow-theme-sm">
+                  <ShieldCheck className="size-5" />
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Admin Panel</span>
-                  <span className="truncate text-xs">Ranin Farayand</span>
+                <div className="grid flex-1 text-right leading-tight">
+                  <span className="truncate font-bold text-sidebar-accent-foreground">
+                    رانین فرایند
+                  </span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    پنل مدیریت
+                  </span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -50,7 +50,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={sidebarItems} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={userData} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

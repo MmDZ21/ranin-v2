@@ -19,6 +19,7 @@ import { RolesGuard } from '../auth/guards/roles/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../generated/enums';
 import { PostStatus } from '../generated/enums';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @Controller('blog')
 export class BlogController {
@@ -27,21 +28,21 @@ export class BlogController {
   // Public endpoints (published content only — enforced in the service)
 
   @Get()
-  async list(@Query('limit') limit?: string) {
-    return this.blogService.list(Number(limit) || 10);
+  async list(@Query() pagination: PaginationDto) {
+    return this.blogService.list(pagination.limit ?? 20);
   }
 
   @Get('featured')
-  async getFeatured(@Query('limit') limit?: string) {
-    return this.blogService.getFeatured(Number(limit) || 5);
+  async getFeatured(@Query() pagination: PaginationDto) {
+    return this.blogService.getFeatured(pagination.limit ?? 20);
   }
 
   @Get('author/:authorId')
   async getByAuthor(
     @Param('authorId') authorId: string,
-    @Query('limit') limit?: string,
+    @Query() pagination: PaginationDto,
   ) {
-    return this.blogService.findByAuthor(authorId, Number(limit) || 10);
+    return this.blogService.findByAuthor(authorId, pagination.limit ?? 20);
   }
 
   @Get(':slug')
@@ -56,13 +57,12 @@ export class BlogController {
   @Get('admin/all')
   async findAll(
     @Query('status') status?: PostStatus,
-    @Query('limit') limit?: string,
-    @Query('offset') offset?: string,
+    @Query() pagination?: PaginationDto,
   ) {
     return this.blogService.findAll(
       status,
-      Number(limit) || 10,
-      Number(offset) || 0,
+      pagination?.limit ?? 20,
+      pagination?.offset ?? 0,
     );
   }
 

@@ -34,8 +34,8 @@ export class LeadsService {
   }
 
   // Get lead by ID
-  async findOne(id: string): Promise<ContactLead | null> {
-    return this.prisma.contactLead.findUnique({
+  async findOne(id: string): Promise<ContactLead> {
+    const lead = await this.prisma.contactLead.findUnique({
       where: { id },
       include: {
         product: {
@@ -47,6 +47,12 @@ export class LeadsService {
         },
       },
     });
+
+    if (!lead) {
+      throw new NotFoundException(`Lead with ID ${id} not found`);
+    }
+
+    return lead;
   }
 
   // Create new lead
@@ -67,11 +73,8 @@ export class LeadsService {
 
   // Update lead
   async update(id: string, updateLeadDto: UpdateLeadDto): Promise<ContactLead> {
-    // Check if lead exists
-    const existingLead = await this.findOne(id);
-    if (!existingLead) {
-      throw new NotFoundException(`Lead with ID ${id} not found`);
-    }
+    // Check if lead exists (throws NotFoundException if not)
+    await this.findOne(id);
 
     return this.prisma.contactLead.update({
       where: { id },
@@ -90,11 +93,8 @@ export class LeadsService {
 
   // Delete lead
   async remove(id: string): Promise<ContactLead> {
-    // Check if lead exists
-    const existingLead = await this.findOne(id);
-    if (!existingLead) {
-      throw new NotFoundException(`Lead with ID ${id} not found`);
-    }
+    // Check if lead exists (throws NotFoundException if not)
+    await this.findOne(id);
 
     return this.prisma.contactLead.delete({
       where: { id },
@@ -173,28 +173,30 @@ export class LeadsService {
 
   // Get leads statistics
   async getStats() {
-    const total = await this.prisma.contactLead.count();
-    const today = await this.prisma.contactLead.count({
-      where: {
-        createdAt: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)),
+    const [total, today, thisWeek, thisMonth] = await Promise.all([
+      this.prisma.contactLead.count(),
+      this.prisma.contactLead.count({
+        where: {
+          createdAt: {
+            gte: new Date(new Date().setHours(0, 0, 0, 0)),
+          },
         },
-      },
-    });
-    const thisWeek = await this.prisma.contactLead.count({
-      where: {
-        createdAt: {
-          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      }),
+      this.prisma.contactLead.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+          },
         },
-      },
-    });
-    const thisMonth = await this.prisma.contactLead.count({
-      where: {
-        createdAt: {
-          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      }),
+      this.prisma.contactLead.count({
+        where: {
+          createdAt: {
+            gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          },
         },
-      },
-    });
+      }),
+    ]);
 
     return {
       total,

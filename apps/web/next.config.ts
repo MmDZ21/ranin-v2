@@ -1,15 +1,21 @@
 import type { NextConfig } from "next";
 import path from "path";
 
+const isVercel = process.env.VERCEL === "1";
+const workspaceRoot = path.join(__dirname, "..", "..");
+
 const nextConfig: NextConfig = {
-  // Self-contained server output for Docker/container deploys.
-  output: "standalone",
-  // Trace workspace files from the monorepo root (also silences the inferred
-  // workspace-root warning).
-  outputFileTracingRoot: path.join(__dirname, "..", ".."),
-  turbopack: {
-    root: path.join(__dirname, "..", ".."),
-  },
+  // Vercel owns its build output and tracing paths. The standalone monorepo
+  // settings remain enabled for the later Docker/VPS deployment.
+  ...(isVercel
+    ? {}
+    : {
+        output: "standalone" as const,
+        outputFileTracingRoot: workspaceRoot,
+        turbopack: {
+          root: workspaceRoot,
+        },
+      }),
   experimental: {
     serverActions: {
       bodySizeLimit: "5mb",
@@ -20,6 +26,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "storage.iran.liara.space" },
       { protocol: "https", hostname: "**.liara.space" },
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
     ],
   },
 };

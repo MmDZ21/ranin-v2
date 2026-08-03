@@ -26,6 +26,9 @@
     "db:seed": "pnpm --filter ./apps/api exec prisma db seed"
   },
   "pnpm": {
+    "overrides": {
+      "zod": "4.4.3"
+    },
     "onlyBuiltDependencies": [
       "@nestjs/core",
       "@prisma/client",

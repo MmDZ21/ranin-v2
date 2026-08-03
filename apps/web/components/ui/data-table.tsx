@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Search } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -54,28 +54,34 @@ export function DataTable<TData, TValue>({
     },
   })
 
+  const filteredCount = table.getFilteredRowModel().rows.length
+
   return (
-    <div>
-      <div className="flex items-center py-4">
-        {searchKey && (
+    <div className="space-y-4">
+      {searchKey && (
+        <div className="relative max-w-sm">
+          <Search className="pointer-events-none absolute top-1/2 start-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="جستجو..."
             value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn(searchKey)?.setFilterValue(event.target.value)
             }
-            className="max-w-sm"
+            className="ps-9"
           />
-        )}
-      </div>
-      <div className="rounded-md border">
+        </div>
+      )}
+      <div className="overflow-hidden rounded-xl border bg-card shadow-theme-sm">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="text-right">
+                    <TableHead
+                      key={header.id}
+                      className="h-11 text-right font-semibold text-foreground"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -96,7 +102,7 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="py-3">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -106,10 +112,10 @@ export function DataTable<TData, TValue>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="hover:bg-transparent">
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-32 text-center text-muted-foreground"
                 >
                   نتیجه‌ای یافت نشد.
                 </TableCell>
@@ -118,27 +124,31 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4 gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          <ChevronRight className="h-4 w-4" />
-          قبلی
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          بعدی
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          {filteredCount.toLocaleString("fa-IR")} مورد
+        </p>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <ChevronRight className="size-4" />
+            قبلی
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            بعدی
+            <ChevronLeft className="size-4" />
+          </Button>
+        </div>
       </div>
     </div>
   )
 }
-

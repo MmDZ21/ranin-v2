@@ -1,17 +1,21 @@
 'use server'
 
+import { unstable_rethrow } from 'next/navigation'
 import { authFetch } from '@/lib/authFetch'
 import { API_URL } from '@/lib/constants'
+import { requireAdminSession } from '@/lib/requireAdmin'
 import { revalidatePath } from 'next/cache'
 import { UserFormValues } from '@/app/dashboard/users/schema'
 
 // Get All
 export async function getUsers() {
   try {
+    await requireAdminSession()
     const res = await authFetch(`${API_URL}/users`)
     if (!res.ok) throw new Error('Failed to fetch users')
     return await res.json()
   } catch (error) {
+    unstable_rethrow(error)
     console.error("Error fetching users:", error)
     return []
   }
@@ -20,10 +24,12 @@ export async function getUsers() {
 // Get One
 export async function getUser(id: string) {
   try {
+    await requireAdminSession()
     const res = await authFetch(`${API_URL}/users/${id}`)
     if (!res.ok) throw new Error('Failed to fetch user')
     return await res.json()
   } catch (error) {
+    unstable_rethrow(error)
     console.error(`Error fetching user ${id}:`, error)
     return null
   }
@@ -32,6 +38,7 @@ export async function getUser(id: string) {
 // Create
 export async function createUser(data: UserFormValues) {
   try {
+    await requireAdminSession()
     const res = await authFetch(`${API_URL}/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,6 +51,7 @@ export async function createUser(data: UserFormValues) {
     revalidatePath('/dashboard/users')
     return { success: true }
   } catch (error: unknown) {
+    unstable_rethrow(error)
     console.error("Error creating user:", error)
     return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' }
   }
@@ -52,6 +60,7 @@ export async function createUser(data: UserFormValues) {
 // Update
 export async function updateUser(id: string, data: UserFormValues) {
   try {
+    await requireAdminSession()
     // Exclude password if it's empty
     const payload = { ...data }
     if (!payload.password) {
@@ -70,6 +79,7 @@ export async function updateUser(id: string, data: UserFormValues) {
     revalidatePath('/dashboard/users')
     return { success: true }
   } catch (error: unknown) {
+    unstable_rethrow(error)
     console.error(`Error updating user ${id}:`, error)
     return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' }
   }
@@ -78,6 +88,7 @@ export async function updateUser(id: string, data: UserFormValues) {
 // Delete
 export async function deleteUser(id: string) {
   try {
+    await requireAdminSession()
     const res = await authFetch(`${API_URL}/users/${id}`, {
       method: 'DELETE',
     })
@@ -85,6 +96,7 @@ export async function deleteUser(id: string) {
     revalidatePath('/dashboard/users')
     return { success: true }
   } catch (error) {
+    unstable_rethrow(error)
     console.error(`Error deleting user ${id}:`, error)
     return { success: false, error: 'Failed to delete user' }
   }

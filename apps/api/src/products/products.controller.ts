@@ -15,6 +15,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AdvancedSearchDto } from './dto/advanced-search.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -28,8 +29,8 @@ export class ProductsController {
   // Public endpoints (for frontend)
 
   @Get()
-  async findPublished(@Query('limit') limit?: string): Promise<Product[]> {
-    return this.productsService.findPublished(Number(limit) || 20);
+  async findPublished(@Query() pagination: PaginationDto): Promise<Product[]> {
+    return this.productsService.findPublished(pagination.limit ?? 20);
   }
 
   @Get('search')
@@ -65,12 +66,12 @@ export class ProductsController {
   }
 
   @Get('slug/:slug')
-  async findBySlug(@Param('slug') slug: string): Promise<Product | null> {
+  async findBySlug(@Param('slug') slug: string): Promise<Product> {
     return this.productsService.findBySlug(slug);
   }
 
   @Get('sku/:sku')
-  async findBySku(@Param('sku') sku: string): Promise<Product | null> {
+  async findBySku(@Param('sku') sku: string): Promise<Product> {
     return this.productsService.findBySku(sku);
   }
 
@@ -80,23 +81,22 @@ export class ProductsController {
   @Roles(Role.ADMIN)
   @Get('admin/all')
   async findAll(
+    @Query() pagination: PaginationDto,
     @Query('published') published?: string,
-    @Query('limit') limit?: string,
-    @Query('offset') offset?: string,
   ): Promise<Product[]> {
     const publishedFilter =
       published === 'true' ? true : published === 'false' ? false : undefined;
     return this.productsService.findAll(
       publishedFilter,
-      Number(limit) || 50,
-      Number(offset) || 0,
+      pagination.limit ?? 20,
+      pagination.offset ?? 0,
     );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Get('admin/:id')
-  async findOne(@Param('id') id: string): Promise<Product | null> {
+  async findOne(@Param('id') id: string): Promise<Product> {
     return this.productsService.findOne(id);
   }
 
@@ -122,7 +122,7 @@ export class ProductsController {
   @Roles(Role.ADMIN)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string): Promise<Product> {
-    return this.productsService.remove(id);
+  async remove(@Param('id') id: string) {
+    await this.productsService.remove(id);
   }
 }

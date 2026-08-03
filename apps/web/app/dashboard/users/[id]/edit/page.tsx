@@ -1,4 +1,5 @@
 import { UserForm } from "../../user-form"
+import { PageHeader } from "@/components/dashboard/page-header"
 import { getUser } from "@/actions/dashboard/users"
 import { notFound } from "next/navigation"
 
@@ -16,9 +17,7 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">ویرایش کاربر</h2>
-      </div>
+      <PageHeader title="ویرایش کاربر" description="اطلاعات این کاربر را به‌روزرسانی کنید" />
       <UserForm initialData={user} userId={id} />
     </div>
   )

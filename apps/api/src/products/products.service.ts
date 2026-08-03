@@ -48,8 +48,8 @@ export class ProductsService {
   }
 
   // Get product by ID
-  async findOne(id: string): Promise<Product | null> {
-    return this.prisma.product.findUnique({
+  async findOne(id: string): Promise<Product> {
+    const product = await this.prisma.product.findUnique({
       where: { id },
       include: {
         category: true,
@@ -59,11 +59,17 @@ export class ProductsService {
         catalogs: true,
       },
     });
+
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    return product;
   }
 
   // Get product by slug (public endpoint)
-  async findBySlug(slug: string): Promise<Product | null> {
-    return this.prisma.product.findFirst({
+  async findBySlug(slug: string): Promise<Product> {
+    const product = await this.prisma.product.findFirst({
       where: { slug, published: true },
       include: {
         category: true,
@@ -71,11 +77,17 @@ export class ProductsService {
         catalogs: true,
       },
     });
+
+    if (!product) {
+      throw new NotFoundException(`Product with slug ${slug} not found`);
+    }
+
+    return product;
   }
 
   // Get product by SKU
-  async findBySku(sku: string): Promise<Product | null> {
-    return this.prisma.product.findFirst({
+  async findBySku(sku: string): Promise<Product> {
+    const product = await this.prisma.product.findFirst({
       where: { sku },
       include: {
         category: true,
@@ -83,6 +95,12 @@ export class ProductsService {
         catalogs: true,
       },
     });
+
+    if (!product) {
+      throw new NotFoundException(`Product with SKU ${sku} not found`);
+    }
+
+    return product;
   }
 
   // Create new product
@@ -118,11 +136,8 @@ export class ProductsService {
     id: string,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    // Check if product exists
+    // Check if product exists (throws NotFoundException if not)
     const existingProduct = await this.findOne(id);
-    if (!existingProduct) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
-    }
 
     const { image, ...productData } = updateProductDto;
     const data: any = { ...productData };
@@ -159,11 +174,8 @@ export class ProductsService {
 
   // Delete product
   async remove(id: string): Promise<Product> {
-    // Check if product exists
-    const existingProduct = await this.findOne(id);
-    if (!existingProduct) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
-    }
+    // Check if product exists (throws NotFoundException if not)
+    await this.findOne(id);
 
     return this.prisma.product.delete({
       where: { id },

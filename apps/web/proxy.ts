@@ -8,7 +8,7 @@ const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7;
 
 export async function proxy(req: NextRequest) {
   const sessionCookie = req.cookies.get("session")?.value;
-  const res = NextResponse.next();
+  let res = NextResponse.next();
 
   if (!sessionCookie) {
     return NextResponse.redirect(new URL(LOGIN_URL, req.url));
@@ -20,8 +20,9 @@ export async function proxy(req: NextRequest) {
     });
 
     if (!payload?.accessToken || !payload.user) {
-      res.cookies.delete("session");
-      return NextResponse.redirect(new URL(LOGIN_URL, req.url));
+      const redirectRes = NextResponse.redirect(new URL(LOGIN_URL, req.url));
+      redirectRes.cookies.delete("session");
+      return redirectRes;
     }
 
     // The dashboard is admin-only. Non-admin (or legacy role-less) sessions go home.
@@ -35,8 +36,9 @@ export async function proxy(req: NextRequest) {
 
     if (isExpired) {
       if (!payload.refreshToken) {
-        res.cookies.delete("session");
-        return NextResponse.redirect(new URL(LOGIN_URL, req.url));
+        const redirectRes = NextResponse.redirect(new URL(LOGIN_URL, req.url));
+        redirectRes.cookies.delete("session");
+        return redirectRes;
       }
 
       try {
@@ -47,8 +49,9 @@ export async function proxy(req: NextRequest) {
         });
 
         if (!refreshRes.ok) {
-          res.cookies.delete("session");
-          return NextResponse.redirect(new URL(LOGIN_URL, req.url));
+          const redirectRes = NextResponse.redirect(new URL(LOGIN_URL, req.url));
+          redirectRes.cookies.delete("session");
+          return redirectRes;
         }
 
         const { accessToken: newAccess, refreshToken: newRefresh } =
@@ -71,6 +74,9 @@ export async function proxy(req: NextRequest) {
           .setExpirationTime(expiredAt)
           .sign(ENCODED_KEY);
 
+        req.cookies.set("session", newSession);
+        res = NextResponse.next({ request: req });
+
         res.cookies.set("session", newSession, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
@@ -79,13 +85,15 @@ export async function proxy(req: NextRequest) {
           path: "/",
         });
       } catch {
-        res.cookies.delete("session");
-        return NextResponse.redirect(new URL(LOGIN_URL, req.url));
+        const redirectRes = NextResponse.redirect(new URL(LOGIN_URL, req.url));
+        redirectRes.cookies.delete("session");
+        return redirectRes;
       }
     }
   } catch {
-    res.cookies.delete("session");
-    return NextResponse.redirect(new URL(LOGIN_URL, req.url));
+    const redirectRes = NextResponse.redirect(new URL(LOGIN_URL, req.url));
+    redirectRes.cookies.delete("session");
+    return redirectRes;
   }
 
   return res;

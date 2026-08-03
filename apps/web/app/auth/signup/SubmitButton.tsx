@@ -1,12 +1,20 @@
 "use client";
-import React from "react";
-import { useFormStatus } from "react-dom";
 
-export default function SubmitButton() {
+import { useFormStatus } from "react-dom";
+import { Button } from "@/components/ui/Button";
+
+export default function SubmitButton({
+  children,
+  pendingText = "در حال ارسال...",
+}: {
+  children: React.ReactNode;
+  pendingText?: string;
+}) {
   const { pending } = useFormStatus();
+
   return (
-    <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
-      {pending ? "Submitting..." : "Submit"}
-    </button>
+    <Button type="submit" size="lg" className="w-full" disabled={pending}>
+      {pending ? pendingText : children}
+    </Button>
   );
 }

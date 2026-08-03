@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import ProductsHeaderServer from "./ProductsHeaderServer";
 import ProductsGridServer from "./ProductsGridServer";
@@ -5,6 +6,13 @@ import { ProductsFilters } from "@/components/pages/products/ProductsFilters";
 import { productCategories } from "@/constants";
 import { HeaderSkeleton, GridSkeleton } from "./skeletons";
 import { Separator } from "@/components/ui/separator";
+
+export const metadata: Metadata = {
+  title: "محصولات",
+  description:
+    "مشاهده و فیلتر کاتالوگ رله‌های حفاظتی و تجهیزات حفاظت الکتریکی صنعتی رانین فرایند برای پست‌ها و تابلوهای برق.",
+  alternates: { canonical: "/products" },
+};
 
 interface ProductsPageProps {
   searchParams?: Promise<{ category?: string }>;

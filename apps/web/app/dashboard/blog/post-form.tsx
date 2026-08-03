@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/Button"
+import { Card, CardBody } from "@/components/ui/Card"
 import {
   Form,
   FormControl,
@@ -65,13 +66,13 @@ export function PostForm({ initialData, postId }: PostFormProps) {
       }
 
       if (!result.success) {
-        setError(result.error || "An error occurred")
+        setError(result.error || "خطایی رخ داد")
         return
       }
 
       router.push("/dashboard/blog")
     } catch (err) {
-      setError("Something went wrong")
+      setError("مشکلی پیش آمد. دوباره تلاش کنید.")
       console.error(err)
     } finally {
       setLoading(false)
@@ -80,13 +81,18 @@ export function PostForm({ initialData, postId }: PostFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-3xl">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span className="block sm:inline">{error}</span>
+          <div
+            role="alert"
+            className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            {error}
           </div>
         )}
-        <div className="grid grid-cols-2 gap-6">
+        <Card>
+          <CardBody className="space-y-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <FormField
             control={form.control}
             name="title"
@@ -148,7 +154,7 @@ export function PostForm({ initialData, postId }: PostFormProps) {
           )}
         />
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <FormField
             control={form.control}
             name="status"
@@ -190,7 +196,7 @@ export function PostForm({ initialData, postId }: PostFormProps) {
             />
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <FormField
             control={form.control}
             name="metaTitle"
@@ -220,11 +226,14 @@ export function PostForm({ initialData, postId }: PostFormProps) {
             />
         </div>
 
+          </CardBody>
+        </Card>
+
         <FormField
           control={form.control}
           name="featured"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <FormItem className="flex flex-row items-center justify-between rounded-xl border bg-card p-4 shadow-theme-sm">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">ویژه</FormLabel>
                 <FormDescription>
@@ -240,8 +249,8 @@ export function PostForm({ initialData, postId }: PostFormProps) {
             </FormItem>
           )}
         />
-        
-        <div className="flex gap-4">
+
+        <div className="flex gap-3">
             <Button type="submit" disabled={loading}>
               {loading ? "در حال ذخیره..." : "ذخیره تغییرات"}
             </Button>

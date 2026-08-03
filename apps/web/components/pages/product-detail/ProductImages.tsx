@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -13,14 +12,20 @@ import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
 import { cn } from "@/lib/utils";
+import {
+  ProductMedia,
+  ProductMediaFallback,
+} from "@/components/ui/ProductMedia";
 
 type ProductImage = { src?: string; url?: string; alt?: string | null };
 
 export default function ProductImages({
   images = [],
+  fallbackLabel,
   className = "",
 }: {
   images?: ProductImage[];
+  fallbackLabel?: string | null;
   className?: string;
 }) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
@@ -30,8 +35,8 @@ export default function ProductImages({
     <section className={cn("bg-transparent py-12 overflow-x-hidden", className)}>
       <div className="container overflow-x-hidden">
         {images.length === 0 ? (
-          <div className="h-96 w-full rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500">
-            No images available
+          <div className="h-96 w-full overflow-hidden rounded-xl border border-border">
+            <ProductMediaFallback label={fallbackLabel} variant="detail" />
           </div>
         ) : (
           <>
@@ -47,12 +52,13 @@ export default function ProductImages({
                 {images.map((image, index) => (
                   <SwiperSlide key={index}>
                     <div className="relative overflow-hidden flex h-full w-full items-center justify-center rounded-lg">
-                      <Image
-                        src={image.src ?? image.url ?? ""}
-                        alt={image.alt ?? ""}
-                        className="block h-full w-full object-contain"
-                        fill
+                      <ProductMedia
+                        src={image.src ?? image.url}
+                        alt={image.alt || fallbackLabel || "تصویر محصول"}
+                        label={fallbackLabel}
+                        variant="detail"
                         sizes="(max-width: 1024px) 100vw, 50vw"
+                        imageClassName="p-4"
                       />
                     </div>
                   </SwiperSlide>
@@ -91,11 +97,11 @@ export default function ProductImages({
               {images.map((image, index) => (
                 <SwiperSlide key={index}>
                   <button className="relative overflow-hidden flex h-full w-full items-center justify-center rounded-lg">
-                    <Image
-                      src={image.src ?? image.url ?? ""}
-                      alt={image.alt ?? ""}
-                      className="block h-full w-full object-contain"
-                      fill
+                    <ProductMedia
+                      src={image.src ?? image.url}
+                      alt={image.alt || fallbackLabel || "تصویر محصول"}
+                      label={fallbackLabel}
+                      variant="compact"
                       sizes="(max-width: 1024px) 25vw, 13vw"
                     />
                   </button>

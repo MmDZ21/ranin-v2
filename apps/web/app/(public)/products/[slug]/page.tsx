@@ -52,10 +52,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   const product = productResult.data;
-  const galleryImages =
-    product.images && product.images.length
-      ? product.images
-      : [{ url: "/images/relay.png", alt: product.name }];
+  const galleryImages = product.images ?? [];
 
   return (
     <div className="container mx-auto px-4 pt-8 pb-12">
@@ -72,7 +69,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           </div>
           <div className="min-w-0">
-            <ProductImages images={galleryImages} />
+            <ProductImages
+              images={galleryImages}
+              fallbackLabel={product.sku ?? product.modelNumber}
+            />
           </div>
         </div>
         <div className="flex-1 min-w-0 space-y-8 lg:space-y-16">

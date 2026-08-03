@@ -58,6 +58,10 @@ jobs:
     name: Web (lint · typecheck · test · build)
     runs-on: ubuntu-latest
     env:
+      # The root workspace install runs the API's Prisma postinstall even in
+      # the web job. Prisma only needs this value to load its config while
+      # generating the client; no database connection is opened here.
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ranin_ci?schema=public
       SESSION_SECRET_KEY: ci-session-secret-at-least-16-characters
       BACKEND_URL: http://localhost:3333/api
       NEXT_PUBLIC_API_URL: http://localhost:3333/api

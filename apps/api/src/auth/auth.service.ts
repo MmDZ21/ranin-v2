@@ -2,17 +2,18 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { verify, hash } from 'argon2';
-import { createHash } from 'crypto';
-import { CreateUserDto } from 'src/user/dto/create-user-dto';
-import { UserService } from 'src/user/user.service';
+import type { ConfigType } from '@nestjs/config';
+import { CreateUserDto } from '../user/dto/create-user-dto';
+import { UserService } from '../user/user.service';
 import { AuthPayload } from './types/auth.jwtPayload';
 import refreshConfig from './config/refresh.config';
-import type { ConfigType } from '@nestjs/config';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { hashSecret, verifySecret } from '../common/security/hashing';
+import { Role } from '../generated/enums';
 
 @Injectable()
 export class AuthService {
@@ -23,46 +24,35 @@ export class AuthService {
     @Inject(refreshConfig.KEY)
     private readonly refreshTokenConfig: ConfigType<typeof refreshConfig>,
   ) {}
+
   async register(createUserDto: CreateUserDto) {
-    const user = await this.userService.findByEmail(createUserDto.email);
-    if (user) {
+    const existing = await this.userService.findByEmail(createUserDto.email);
+    if (existing) {
       throw new ConflictException('User already exists');
     }
-    return await this.userService.create(createUserDto);
+    // userService.create assigns the USER role and returns a sanitized record
+    // (no password / refresh-token hash).
+    return this.userService.create(createUserDto);
   }
 
   async validateLocalUser(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
-    if (!user) {
-      throw new UnauthorizedException('user not found');
+    // Single generic message for both unknown-email and bad-password to avoid
+    // account enumeration.
+    if (!user || !(await verifySecret(user.password, password))) {
+      throw new UnauthorizedException('Invalid credentials');
     }
-    const isPasswordValid = await verify(user.password, password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('invalid credentials');
-    }
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    };
+    return { id: user.id, name: user.name, email: user.email, role: user.role };
   }
 
-  async login(userId: string, email: string, name: string) {
+  async login(userId: string, email: string, name: string | null, role: Role) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
-    
-    // Store hashed refresh token in database for validation (using deterministic hash)
-    const hashedRefreshToken = createHash('sha256').update(refreshToken).digest('hex');
     await this.prisma.user.update({
       where: { id: userId },
-      data: { hashedRefreshToken },
+      data: { hashedRefreshToken: await hashSecret(refreshToken) },
     });
-    
     return {
-      user: {
-        id: userId,
-        email,
-        name,
-      },
+      user: { id: userId, email, name, role },
       accessToken,
       refreshToken,
     };
@@ -74,67 +64,67 @@ export class AuthService {
       this.jwtService.signAsync(payload),
       this.jwtService.signAsync(payload, this.refreshTokenConfig),
     ]);
+    return { accessToken, refreshToken };
+  }
 
+  async validateJwtUser(userId: string) {
+    // findById throws NotFoundException for an unknown id (e.g. a user deleted
+    // after their access token was issued) — that's a 401 here, not a 404.
+    try {
+      const user = await this.userService.findById(userId);
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      };
+    } catch (err) {
+      if (err instanceof NotFoundException) {
+        throw new UnauthorizedException('User not found');
+      }
+      throw err;
+    }
+  }
+
+  async validateRefreshToken(userId: string, refreshToken?: string) {
+    // Needs the stored hash, so query the full record directly. A refresh is
+    // only accepted when a stored hash exists AND verifies against the token.
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.hashedRefreshToken || !refreshToken) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    const valid = await verifySecret(user.hashedRefreshToken, refreshToken);
+    if (!valid) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    return { id: user.id, email: user.email, name: user.name, role: user.role };
+  }
+
+  async refreshToken(
+    userId: string,
+    email: string,
+    name: string | null,
+    role: Role,
+  ) {
+    // Rotate: issue new tokens and replace the stored refresh-token hash so the
+    // previous refresh token can no longer be used.
+    const { accessToken, refreshToken } = await this.generateTokens(userId);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { hashedRefreshToken: await hashSecret(refreshToken) },
+    });
     return {
+      user: { id: userId, email, name, role },
       accessToken,
       refreshToken,
     };
   }
 
-  async validateJwtUser(userId: string) {
-    const user = await this.userService.findById(userId);
-    if (!user) {
-      throw new UnauthorizedException('user not found');
-    }
-    const currentUser = { id: user.id, email: user.email, name: user.name };
-    return currentUser;
-  }
-
-  async validateRefreshToken(userId: string, refreshToken?: string) {
-    const user = await this.userService.findById(userId);
-    if (!user) {
-      throw new UnauthorizedException('user not found');
-    }
-    
-    // If refresh token is provided, validate it against stored hash
-    if (refreshToken && user.hashedRefreshToken) {
-      try {
-        // Hash the incoming refresh token using the same deterministic hash
-        const hashedIncomingToken = createHash('sha256').update(refreshToken).digest('hex');
-        if (hashedIncomingToken !== user.hashedRefreshToken) {
-          throw new UnauthorizedException('invalid refresh token');
-        }
-      } catch (error) {
-        throw new UnauthorizedException('invalid refresh token');
-      }
-    }
-    
-    const currentUser = { id: user.id, email: user.email, name: user.name };
-    return currentUser;
-  }
-
-  async refreshToken(userId: string, email: string, name: string, oldRefreshToken?: string) {
-    // Generate new tokens
-    const { accessToken, refreshToken: newRefreshToken } = await this.generateTokens(userId);
-    
-    // Store new hashed refresh token (token rotation) using deterministic hash
-    const hashedRefreshToken = createHash('sha256').update(newRefreshToken).digest('hex');
+  async logout(userId: string) {
     await this.prisma.user.update({
       where: { id: userId },
-      data: { hashedRefreshToken },
+      data: { hashedRefreshToken: null },
     });
-    
-    // Optionally invalidate old refresh token if provided
-    // This prevents token reuse attacks
-    
-    return {
-      user: {
-        id: userId,
-        email,
-        name,
-      },
-      accessToken,
-      refreshToken: newRefreshToken,
-    };
-}
+    return { success: true };
+  }
 }

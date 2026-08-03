@@ -1,4 +1,5 @@
 import { ProductForm } from "../product-form"
+import { PageHeader } from "@/components/dashboard/page-header"
 import { getCategories } from "@/actions/dashboard/categories"
 
 export default async function NewProductPage() {
@@ -6,9 +7,7 @@ export default async function NewProductPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">افزودن محصول جدید</h2>
-      </div>
+      <PageHeader title="افزودن محصول جدید" description="یک محصول تازه به فروشگاه اضافه کنید" />
       <ProductForm categories={categories} />
     </div>
   )

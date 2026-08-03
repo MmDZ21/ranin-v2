@@ -1,4 +1,5 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL;
+export const API_URL =
+  process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL;
 
 const DEFAULT_DELAY_MS = Number(process.env.NEXT_PUBLIC_API_DELAY_MS || 0);
 
@@ -19,5 +20,11 @@ export const fetchClient = async (
   const path = url.startsWith('/') ? url : `/${url}`;
 
   const response = await fetch(base + path, options);
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.message || `Request failed: ${response.status}`);
+  }
+
   return response.json();
 };

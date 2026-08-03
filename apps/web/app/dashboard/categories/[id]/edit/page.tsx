@@ -1,6 +1,8 @@
 import { CategoryForm } from "../../category-form"
+import { PageHeader } from "@/components/dashboard/page-header"
 import { getCategory, getCategories } from "@/actions/dashboard/categories"
 import { notFound } from "next/navigation"
+import type { Category } from "@/types/category.types"
 
 interface EditCategoryPageProps {
   params: Promise<{ id: string }>
@@ -16,13 +18,11 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
   }
 
   // Filter out the current category to avoid selecting itself as parent (prevent cycles)
-  const availableCategories = categories.filter((c: any) => c.id !== id)
+  const availableCategories = categories.filter((c: Category) => c.id !== id)
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">ویرایش دسته‌بندی</h2>
-      </div>
+      <PageHeader title="ویرایش دسته‌بندی" description="اطلاعات این دسته‌بندی را به‌روزرسانی کنید" />
       <CategoryForm initialData={category} categoryId={id} categories={availableCategories} />
     </div>
   )

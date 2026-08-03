@@ -18,6 +18,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 className="object-contain w-full h-full group-hover:scale-105 transition-transform duration-300"
                 width={300}
                 height={300}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
               />
             ) : (
               <div className="flex flex-col items-center justify-center text-gray-300">
@@ -26,7 +27,7 @@ export default function ProductCard({ product }: { product: Product }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <span className="text-xs text-gray-400">بدون تصویر</span>
+                <span className="text-xs text-gray-600">بدون تصویر</span>
               </div>
             )}
           </div>

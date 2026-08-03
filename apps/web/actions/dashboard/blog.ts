@@ -1,17 +1,21 @@
 'use server'
 
+import { unstable_rethrow } from 'next/navigation'
 import { authFetch } from '@/lib/authFetch'
 import { API_URL } from '@/lib/constants'
+import { requireAdminSession } from '@/lib/requireAdmin'
 import { revalidatePath } from 'next/cache'
 import { PostFormValues } from '@/app/dashboard/blog/schema'
 
 // Get All
 export async function getPosts() {
   try {
+    await requireAdminSession()
     const res = await authFetch(`${API_URL}/blog/admin/all`)
     if (!res.ok) throw new Error('Failed to fetch posts')
     return await res.json()
   } catch (error) {
+    unstable_rethrow(error)
     console.error("Error fetching posts:", error)
     return []
   }
@@ -20,10 +24,12 @@ export async function getPosts() {
 // Get One
 export async function getPost(id: string) {
   try {
+    await requireAdminSession()
     const res = await authFetch(`${API_URL}/blog/admin/${id}`)
     if (!res.ok) throw new Error('Failed to fetch post')
     return await res.json()
   } catch (error) {
+    unstable_rethrow(error)
     console.error(`Error fetching post ${id}:`, error)
     return null
   }
@@ -32,6 +38,7 @@ export async function getPost(id: string) {
 // Create
 export async function createPost(data: PostFormValues) {
   try {
+    await requireAdminSession()
     const res = await authFetch(`${API_URL}/blog`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,6 +51,7 @@ export async function createPost(data: PostFormValues) {
     revalidatePath('/dashboard/blog')
     return { success: true }
   } catch (error: unknown) {
+    unstable_rethrow(error)
     console.error("Error creating post:", error)
     return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' }
   }
@@ -52,6 +60,7 @@ export async function createPost(data: PostFormValues) {
 // Update
 export async function updatePost(id: string, data: PostFormValues) {
   try {
+    await requireAdminSession()
     const res = await authFetch(`${API_URL}/blog/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -64,6 +73,7 @@ export async function updatePost(id: string, data: PostFormValues) {
     revalidatePath('/dashboard/blog')
     return { success: true }
   } catch (error: unknown) {
+    unstable_rethrow(error)
     console.error(`Error updating post ${id}:`, error)
     return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' }
   }
@@ -72,6 +82,7 @@ export async function updatePost(id: string, data: PostFormValues) {
 // Delete
 export async function deletePost(id: string) {
   try {
+    await requireAdminSession()
     const res = await authFetch(`${API_URL}/blog/${id}`, {
       method: 'DELETE',
     })
@@ -79,6 +90,7 @@ export async function deletePost(id: string) {
     revalidatePath('/dashboard/blog')
     return { success: true }
   } catch (error) {
+    unstable_rethrow(error)
     console.error(`Error deleting post ${id}:`, error)
     return { success: false, error: 'Failed to delete post' }
   }

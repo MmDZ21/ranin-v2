@@ -67,26 +67,22 @@ export async function login(
     },
     body: JSON.stringify(validatedFields.data),
   });
-  
-  console.log(`[Auth] Login response status: ${response.status}`);
 
   if (response.ok) {
     const data = await response.json();
     const { user, accessToken, refreshToken } = data;
-
-    console.log("[Auth] Login successful, creating session...");
 
     await createSession({
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
+        role: user.role,
       },
       accessToken,
       refreshToken,
     });
-    
-    console.log("[Auth] Session created, redirecting to dashboard.");
+
     redirect("/dashboard");
   } else {
     return {

@@ -1,5 +1,5 @@
-import { registerAs } from "@nestjs/config";
-import { JwtModuleOptions } from "@nestjs/jwt";
+import { registerAs } from '@nestjs/config';
+import { JwtModuleOptions } from '@nestjs/jwt';
 
 const parseExpiresIn = (value?: string): number | undefined => {
   if (!value) {
@@ -19,21 +19,25 @@ const parseExpiresIn = (value?: string): number | undefined => {
 
   const unit = match[2]?.toLowerCase();
   switch (unit) {
-    case "m":
+    case 'm':
       return amount * 60;
-    case "h":
+    case 'h':
       return amount * 60 * 60;
-    case "d":
+    case 'd':
       return amount * 60 * 60 * 24;
-    case "s":
+    case 's':
     default:
       return amount;
   }
 };
 
-export default registerAs("jwt", (): JwtModuleOptions => ({
-  secret: process.env.JWT_SECRET,
-  signOptions: {
-    expiresIn: parseExpiresIn(process.env.JWT_EXPIRES_IN),
-  },
-}));
+export default registerAs(
+  'jwt',
+  (): JwtModuleOptions => ({
+    secret: process.env.JWT_SECRET,
+    signOptions: {
+      // Never allow a non-expiring access token — default to 15 minutes.
+      expiresIn: parseExpiresIn(process.env.JWT_EXPIRES_IN) ?? 900,
+    },
+  }),
+);

@@ -1,1 +1,46 @@
+# Dependencies
 node_modules
+.pnpm-store
+
+# Build outputs
+dist
+build
+.next
+out
+*.tsbuildinfo
+
+# Environment / secrets (never commit real env files)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Test / coverage
+coverage
+.nyc_output
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea
+*.sublime-workspace
+.vscode/*
+!.vscode/extensions.json
+
+# Misc
+*.pid
+*.seed
+.turbo
+.cache
+.qodo
+apps.zip
+.playwright-mcp

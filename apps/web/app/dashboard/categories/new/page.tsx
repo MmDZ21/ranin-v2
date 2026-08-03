@@ -1,14 +1,13 @@
 import { CategoryForm } from "../category-form"
+import { PageHeader } from "@/components/dashboard/page-header"
 import { getCategories } from "@/actions/dashboard/categories"
 
 export default async function NewCategoryPage() {
   const categories = await getCategories()
-  
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">افزودن دسته‌بندی جدید</h2>
-      </div>
+      <PageHeader title="افزودن دسته‌بندی جدید" description="یک دسته‌بندی تازه برای محصولات بسازید" />
       <CategoryForm categories={categories} />
     </div>
   )

@@ -13,9 +13,10 @@ export type FormState =
 
 export type Session = {
   user: {
-    id: number;
+    id: string;
     email: string;
-    name: string;
+    name: string | null;
+    role: "ADMIN" | "USER";
   };
   accessToken: string;
   refreshToken: string;

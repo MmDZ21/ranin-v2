@@ -1,33 +1,32 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Put, 
-  Delete, 
-  Param, 
-  Body, 
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
   Query,
   HttpCode,
   HttpStatus,
   UseGuards,
-  Logger
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../generated/enums';
 
 @Controller('categories')
 export class CategoriesController {
-  private readonly logger = new Logger(CategoriesController.name);
-
   constructor(private categoriesService: CategoriesService) {}
 
   // Public endpoints (for frontend)
 
   @Get()
   async findAll(@Query('tree') tree?: string) {
-    this.logger.log(`GET /categories tree=${tree}`);
     if (tree === 'true') {
       return this.categoriesService.findTree();
     }
@@ -36,53 +35,49 @@ export class CategoriesController {
 
   @Get('with-counts')
   async findWithProductCounts() {
-    this.logger.log('GET /categories/with-counts');
     return this.categoriesService.findWithProductCounts();
   }
 
   @Get('tree')
   async findTree() {
-    this.logger.log('GET /categories/tree');
     return this.categoriesService.findTree();
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    this.logger.log(`GET /categories/${id}`);
     return this.categoriesService.findOne(id);
   }
 
   @Get('slug/:slug')
   async findBySlug(@Param('slug') slug: string) {
-    this.logger.log(`GET /categories/slug/${slug}`);
     return this.categoriesService.findBySlug(slug);
   }
 
-  // Admin endpoints (protected)
+  // Admin endpoints (ADMIN only)
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createCategoryDto: CreateCategoryDto) {
-    this.logger.log('POST /categories');
     return this.categoriesService.create(createCategoryDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateCategoryDto: UpdateCategoryDto
+    @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    this.logger.log(`PUT /categories/${id}`);
     return this.categoriesService.update(id, updateCategoryDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {
-    this.logger.log(`DELETE /categories/${id}`);
     await this.categoriesService.remove(id);
   }
 }

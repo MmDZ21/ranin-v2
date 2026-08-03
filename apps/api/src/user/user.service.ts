@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user-dto';
-import { hash } from 'argon2';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { hashSecret } from '../common/security/hashing';
+import { Role } from '../generated/enums';
+
+// Never return these to API consumers.
+const SAFE_OMIT = { password: true, hashedRefreshToken: true } as const;
 
 @Injectable()
 export class UserService {
@@ -9,50 +14,62 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     const { password, ...userData } = createUserDto;
-    const hashedPassword = await hash(password);
-    const user = await this.prisma.user.create({
+    return this.prisma.user.create({
       data: {
         ...userData,
-        password: hashedPassword,
+        password: await hashSecret(password),
+        // Force USER on self-service creation — admins are provisioned via seed.
+        role: Role.USER,
       },
+      omit: SAFE_OMIT,
     });
-    return user;
   }
 
+  /**
+   * Internal use only (authentication): returns the full record INCLUDING the
+   * password hash. Never expose this result from a controller.
+   */
   async findByEmail(email: string) {
-    return await this.prisma.user.findUnique({
-      where: { email },
-    });
+    return this.prisma.user.findUnique({ where: { email } });
   }
 
   async findById(id: string) {
-    if (id === undefined || id === null) {
-      return null;
-    }
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id },
+      omit: SAFE_OMIT,
     });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return user;
   }
 
   async findAll() {
-    return await this.prisma.user.findMany({
+    return this.prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
+      omit: SAFE_OMIT,
     });
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: UpdateUserDto) {
+    const updateData: { name?: string; email?: string; password?: string } = {
+      name: data.name,
+      email: data.email,
+    };
     if (data.password) {
-      data.password = await hash(data.password);
+      updateData.password = await hashSecret(data.password);
     }
-    return await this.prisma.user.update({
+    return this.prisma.user.update({
       where: { id },
-      data,
+      data: updateData,
+      omit: SAFE_OMIT,
     });
   }
 
   async remove(id: string) {
-    return await this.prisma.user.delete({
-      where: { id },
-    });
+    await this.prisma.user.delete({ where: { id } });
+    return { success: true };
   }
 }

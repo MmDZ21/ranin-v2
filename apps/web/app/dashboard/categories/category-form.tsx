@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/Button"
+import { Card, CardBody } from "@/components/ui/Card"
 import {
   Form,
   FormControl,
@@ -70,13 +71,13 @@ export function CategoryForm({ initialData, categoryId, categories }: CategoryFo
       }
 
       if (!result.success) {
-        setError(result.error || "An error occurred")
+        setError(result.error || "خطایی رخ داد")
         return
       }
 
       router.push("/dashboard/categories")
     } catch (err) {
-      setError("Something went wrong")
+      setError("مشکلی پیش آمد. دوباره تلاش کنید.")
       console.error(err)
     } finally {
       setLoading(false)
@@ -85,12 +86,17 @@ export function CategoryForm({ initialData, categoryId, categories }: CategoryFo
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span className="block sm:inline">{error}</span>
+          <div
+            role="alert"
+            className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            {error}
           </div>
         )}
+        <Card>
+          <CardBody className="space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -160,7 +166,7 @@ export function CategoryForm({ initialData, categoryId, categories }: CategoryFo
                             (category) => category.id === field.value
                           )?.name
                         : "انتخاب دسته‌بندی والد"}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
@@ -185,7 +191,7 @@ export function CategoryForm({ initialData, categoryId, categories }: CategoryFo
                           >
                             <Check
                               className={cn(
-                                "mr-2 h-4 w-4",
+                                "size-4",
                                 category.id === field.value
                                   ? "opacity-100"
                                   : "opacity-0"
@@ -217,8 +223,10 @@ export function CategoryForm({ initialData, categoryId, categories }: CategoryFo
             </FormItem>
           )}
         />
-        
-        <div className="flex gap-4">
+          </CardBody>
+        </Card>
+
+        <div className="flex gap-3">
             <Button type="submit" disabled={loading}>
               {loading ? "در حال ذخیره..." : "ذخیره تغییرات"}
             </Button>

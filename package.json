@@ -1,5 +1,63 @@
 {
-	"dependencies": {
-
-	}
+  "name": "ranin-v2",
+  "version": "1.0.0",
+  "private": true,
+  "description": "E-commerce monorepo for industrial electrical protection relays (NestJS API + Next.js web).",
+  "packageManager": "pnpm@10.13.1",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "dev:api": "pnpm --filter ./apps/api start:dev",
+    "dev:web": "pnpm --filter ./apps/web dev",
+    "build": "pnpm -r build",
+    "build:api": "pnpm --filter ./apps/api build",
+    "build:web": "pnpm --filter ./apps/web build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm --filter ./apps/api test",
+    "format": "pnpm -r format",
+    "typecheck": "pnpm -r typecheck",
+    "prisma:generate": "pnpm --filter ./apps/api prisma:generate",
+    "db:migrate": "pnpm --filter ./apps/api exec prisma migrate dev",
+    "db:deploy": "pnpm --filter ./apps/api exec prisma migrate deploy",
+    "db:seed": "pnpm --filter ./apps/api exec prisma db seed"
+  },
+  "pnpm": {
+    "overrides": {
+      "@babel/core@^7.0.0": "7.29.6",
+      "body-parser@^2.0.0": "2.3.0",
+      "brace-expansion@^1.0.0": "1.1.18",
+      "brace-expansion@^2.0.0": "2.1.4",
+      "brace-expansion@^5.0.0": "5.0.9",
+      "diff@^4.0.0": "4.0.4",
+      "fast-uri": "3.1.4",
+      "flatted@^3.0.0": "3.4.4",
+      "form-data@^4.0.0": "4.0.6",
+      "glob@^10.0.0": "10.5.0",
+      "hono": "4.12.34",
+      "js-yaml@^3.0.0": "3.15.1",
+      "js-yaml@^4.0.0": "4.3.0",
+      "jws": "3.2.3",
+      "minimatch@^9.0.0": "9.0.9",
+      "multer": "2.2.0",
+      "picomatch@^2.0.0": "2.3.2",
+      "postcss": "8.5.25",
+      "sharp": "0.35.3",
+      "zod": "4.4.3"
+    },
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "@tailwindcss/oxide",
+      "argon2",
+      "esbuild",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
 }

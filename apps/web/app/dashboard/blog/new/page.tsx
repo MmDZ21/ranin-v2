@@ -1,13 +1,11 @@
 import { PostForm } from "../post-form"
+import { PageHeader } from "@/components/dashboard/page-header"
 
 export default function NewPostPage() {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">افزودن نوشته جدید</h2>
-      </div>
+      <PageHeader title="افزودن نوشته جدید" description="یک نوشته تازه برای وبلاگ بنویسید" />
       <PostForm />
     </div>
   )
 }
-

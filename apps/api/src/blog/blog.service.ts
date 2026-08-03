@@ -2,26 +2,30 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBlogPostDto } from './dto/create-blog-post.dto';
 import { UpdateBlogPostDto } from './dto/update-blog-post.dto';
-import { PostStatus } from 'src/generated/enums';
-import { BlogPost } from 'src/generated/client';
+import { PostStatus } from '../generated/enums';
+import { BlogPost } from '../generated/client';
 
 @Injectable()
 export class BlogService {
   constructor(private prisma: PrismaService) {}
 
   // Get all blog posts with optional filtering
-  async findAll(status?: PostStatus, limit = 10, offset = 0): Promise<BlogPost[]> {
+  async findAll(
+    status?: PostStatus,
+    limit = 10,
+    offset = 0,
+  ): Promise<BlogPost[]> {
     const where = status ? { status } : {};
-    
+
     return this.prisma.blogPost.findMany({
       where,
       take: limit,
       skip: offset,
       orderBy: { createdAt: 'desc' },
-      include: { 
-        author: true, 
-        images: true, 
-        tags: { include: { tag: true } } 
+      include: {
+        author: true,
+        images: true,
+        tags: { include: { tag: true } },
       },
     });
   }
@@ -37,43 +41,62 @@ export class BlogService {
   }
 
   // Get blog post by ID
-  async findOne(id: string): Promise<BlogPost | null> {
-    return this.prisma.blogPost.findUnique({
+  async findOne(id: string): Promise<BlogPost> {
+    const blogPost = await this.prisma.blogPost.findUnique({
       where: { id },
-      include: { 
-        author: true, 
-        images: true, 
-        tags: { include: { tag: true } } 
+      include: {
+        author: true,
+        images: true,
+        tags: { include: { tag: true } },
       },
     });
+
+    if (!blogPost) {
+      throw new NotFoundException(`Blog post with ID ${id} not found`);
+    }
+
+    return blogPost;
   }
 
-  // Get blog post by slug (public endpoint)
-  async findBySlug(slug: string): Promise<BlogPost | null> {
-    return this.prisma.blogPost.findUnique({
-      where: { slug },
+  // Get blog post by slug (public endpoint — published content only)
+  async findBySlug(slug: string): Promise<BlogPost> {
+    const blogPost = await this.prisma.blogPost.findFirst({
+      where: { slug, status: 'PUBLISHED' },
       include: { author: true, images: true, tags: { include: { tag: true } } },
     });
+
+    if (!blogPost) {
+      throw new NotFoundException(`Blog post with slug ${slug} not found`);
+    }
+
+    return blogPost;
   }
 
   // Create new blog post
   async create(createBlogPostDto: CreateBlogPostDto): Promise<BlogPost> {
     const { tagIds, ...postData } = createBlogPostDto;
-    
+    const status = postData.status ?? PostStatus.PUBLISHED;
+
     const blogPost = await this.prisma.blogPost.create({
       data: {
         ...postData,
-        publishedAt: postData.publishedAt ? new Date(postData.publishedAt) : null,
-        tags: tagIds ? {
-          create: tagIds.map(tagId => ({
-            tag: { connect: { id: tagId } }
-          }))
-        } : undefined,
+        publishedAt: postData.publishedAt
+          ? new Date(postData.publishedAt)
+          : status === PostStatus.PUBLISHED
+            ? new Date()
+            : null,
+        tags: tagIds
+          ? {
+              create: tagIds.map((tagId) => ({
+                tag: { connect: { id: tagId } },
+              })),
+            }
+          : undefined,
       },
-      include: { 
-        author: true, 
-        images: true, 
-        tags: { include: { tag: true } } 
+      include: {
+        author: true,
+        images: true,
+        tags: { include: { tag: true } },
       },
     });
 
@@ -81,31 +104,38 @@ export class BlogService {
   }
 
   // Update blog post
-  async update(id: string, updateBlogPostDto: UpdateBlogPostDto): Promise<BlogPost> {
+  async update(
+    id: string,
+    updateBlogPostDto: UpdateBlogPostDto,
+  ): Promise<BlogPost> {
     const { tagIds, ...postData } = updateBlogPostDto;
-    
+
     // Check if blog post exists
     const existingPost = await this.findOne(id);
-    if (!existingPost) {
-      throw new NotFoundException(`Blog post with ID ${id} not found`);
-    }
+    const status = postData.status ?? existingPost.status;
 
     const blogPost = await this.prisma.blogPost.update({
       where: { id },
       data: {
         ...postData,
-        publishedAt: postData.publishedAt ? new Date(postData.publishedAt) : undefined,
-        tags: tagIds ? {
-          deleteMany: {},
-          create: tagIds.map(tagId => ({
-            tag: { connect: { id: tagId } }
-          }))
-        } : undefined,
+        publishedAt: postData.publishedAt
+          ? new Date(postData.publishedAt)
+          : status === PostStatus.PUBLISHED && !existingPost.publishedAt
+            ? new Date()
+            : undefined,
+        tags: tagIds
+          ? {
+              deleteMany: {},
+              create: tagIds.map((tagId) => ({
+                tag: { connect: { id: tagId } },
+              })),
+            }
+          : undefined,
       },
-      include: { 
-        author: true, 
-        images: true, 
-        tags: { include: { tag: true } } 
+      include: {
+        author: true,
+        images: true,
+        tags: { include: { tag: true } },
       },
     });
 
@@ -115,17 +145,14 @@ export class BlogService {
   // Delete blog post
   async remove(id: string): Promise<BlogPost> {
     // Check if blog post exists
-    const existingPost = await this.findOne(id);
-    if (!existingPost) {
-      throw new NotFoundException(`Blog post with ID ${id} not found`);
-    }
+    await this.findOne(id);
 
     return this.prisma.blogPost.delete({
       where: { id },
-      include: { 
-        author: true, 
-        images: true, 
-        tags: { include: { tag: true } } 
+      include: {
+        author: true,
+        images: true,
+        tags: { include: { tag: true } },
       },
     });
   }
@@ -133,9 +160,9 @@ export class BlogService {
   // Get featured blog posts
   async getFeatured(limit = 5): Promise<BlogPost[]> {
     return this.prisma.blogPost.findMany({
-      where: { 
+      where: {
         featured: true,
-        status: 'PUBLISHED' 
+        status: 'PUBLISHED',
       },
       take: limit,
       orderBy: { publishedAt: 'desc' },
@@ -143,10 +170,10 @@ export class BlogService {
     });
   }
 
-  // Get blog posts by author
+  // Get blog posts by author (public endpoint — published content only)
   async findByAuthor(authorId: string, limit = 10): Promise<BlogPost[]> {
     return this.prisma.blogPost.findMany({
-      where: { authorId },
+      where: { authorId, status: 'PUBLISHED' },
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: { author: true },

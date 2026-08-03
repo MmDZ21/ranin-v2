@@ -10,5 +10,3 @@ export interface User {
   createdAt: string; // ISO
   updatedAt: string; // ISO
 }
-
-

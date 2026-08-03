@@ -50,9 +50,9 @@ export function ProductsHeader({ categories, activeCategorySlug }: ProductsHeade
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
           <div className="flex flex-col gap-2 sm:gap-4">
-            <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-black">
               {activeCategory.name}
-            </h2>
+            </h1>
             <p className="text-muted-foreground text-sm sm:text-base">
               {activeCategory.description}
             </p>

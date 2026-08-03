@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import ProductsHeaderServer from "./ProductsHeaderServer";
 import ProductsGridServer from "./ProductsGridServer";
-import { ProductsFilters } from "@/components/pages/products/ProductsFilters";
 import { productCategories } from "@/constants";
 import { HeaderSkeleton, GridSkeleton } from "./skeletons";
 import { Separator } from "@/components/ui/separator";
+import { Container } from "@/components/ui/Container";
 
 export const metadata: Metadata = {
   title: "محصولات",
@@ -15,37 +15,34 @@ export const metadata: Metadata = {
 };
 
 interface ProductsPageProps {
-  searchParams?: Promise<{ category?: string }>;
+  searchParams?: Promise<{ category?: string; page?: string }>;
 }
 
 export default async function ProductsPage({
   searchParams,
 }: ProductsPageProps) {
-  // Get active category slug from query params
-  const activeCategorySlug =
-    (await searchParams)?.category || productCategories[0].slug;
+  const query = await searchParams;
+  const activeCategorySlug = query?.category || productCategories[0].slug;
+  const parsedPage = Number.parseInt(query?.page ?? "1", 10);
+  const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
   return (
-    <div className="container mx-auto px-4 py-4 sm:py-8">
+    <Container className="py-4 sm:py-8">
       <div className="flex items-center gap-2 pb-6 sm:pb-6">
         <Separator orientation="horizontal" className="!w-4 bg-primary" />
-        <h1 className="text-sm text-primary font-bold">محصولات</h1>
+        <span className="text-sm text-primary font-bold">کاتالوگ محصولات</span>
       </div>
       <Suspense fallback={<HeaderSkeleton />}>
         <ProductsHeaderServer activeCategorySlug={activeCategorySlug} />
       </Suspense>
 
-      {/* Filter and Sort Controls */}
-      <div className="py-4 sm:py-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4 sm:gap-0">
-          <ProductsFilters />
-        </div>
-      </div>
-
       {/* Products Grid */}
-      <Suspense fallback={<GridSkeleton />}>
-        <ProductsGridServer activeCategorySlug={activeCategorySlug} />
+      <Suspense key={`${activeCategorySlug}-${currentPage}`} fallback={<GridSkeleton />}>
+        <ProductsGridServer
+          activeCategorySlug={activeCategorySlug}
+          currentPage={currentPage}
+        />
       </Suspense>
-    </div>
+    </Container>
   );
 }

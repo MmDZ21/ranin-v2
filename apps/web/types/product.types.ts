@@ -37,6 +37,13 @@ export interface Product {
   updatedAt: string; // ISO
 }
 
+export interface PaginatedProducts {
+  items: Product[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 export interface CreateProductInput {
   sku?: string;
   name: string;

@@ -5,6 +5,7 @@ import { FooterConfig } from "@/constants";
 
 export async function Footer(p: FooterConfig) {
   const {quickLinks, services, contactEmail, note } = p;
+  const currentYear = new Intl.DateTimeFormat("fa-IR", { year: "numeric" }).format(new Date());
   return (
     <footer className="bg-gray-900 text-white">
       <Container className="py-12 md:py-16">
@@ -70,7 +71,7 @@ export async function Footer(p: FooterConfig) {
       <div className="border-t border-gray-800">
         <Container className="py-6">
           <div className="text-center text-gray-400 text-sm">
-            {note || "© ۲۰۲۵ رانین فرایند. تمامی حقوق محفوظ است."}
+            {note || `© ${currentYear} رانین فرایند. تمامی حقوق محفوظ است.`}
           </div>
         </Container>
       </div>

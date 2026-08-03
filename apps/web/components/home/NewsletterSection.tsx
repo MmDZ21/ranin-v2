@@ -1,16 +1,16 @@
 "use client";
 
 import { motion } from "motion/react";
+import Link from "next/link";
 
-import { MailCheck } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useEnterAnimation } from "@/lib/animations";
 import { Button } from "../ui/Button";
 import { Container } from "../ui/Container";
 import { NewsletterSectionProps } from "@/constants";
-import { Input } from "../ui/input";
 
 export function NewsletterSection(props: NewsletterSectionProps) {
-  const { title, subtitle, placeholder, buttonText } = props;
+  const { title, subtitle, buttonText, buttonHref } = props;
 
   const { ref, animate, variants } = useEnterAnimation({
     staggerDelay: 0.2,
@@ -40,22 +40,13 @@ export function NewsletterSection(props: NewsletterSectionProps) {
             {subtitle}
           </motion.p>
 
-          <motion.div className="mx-auto max-w-lg" variants={variants.fadeInUp}>
-            <form className="flex flex-col gap-3 sm:flex-row md:gap-4">
-              <Input
-                type="email"
-                placeholder={placeholder}
-                className="bg-background text-foreground placeholder-muted-foreground placeholder:text-sm focus:ring-primary/30 md:flex-1 rounded-xl  border-0 px-4 py-4 transition-all focus:ring-4 focus:outline-none md:px-6 md:py-6"
-                required
-              />
-              <Button
-                type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-xl py-4 sm:w-auto md:py-6"
-              >
+          <motion.div className="mx-auto flex justify-center" variants={variants.fadeInUp}>
+            <Button asChild size="lg" className="w-full gap-2 sm:w-auto">
+              <Link href={buttonHref}>
                 {buttonText}
-                <MailCheck className="h-4 w-4 md:h-5 md:w-5" />
-              </Button>
-            </form>
+                <FileText className="h-4 w-4 md:h-5 md:w-5" />
+              </Link>
+            </Button>
           </motion.div>
         </motion.div>
       </Container>

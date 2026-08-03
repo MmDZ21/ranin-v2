@@ -84,12 +84,14 @@ function HeroTextContent({ slide, isActive }: { slide: HeroSlide; isActive: bool
             className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3"
           >
             <Button asChild className="w-full sm:w-auto">
-              <Link href={slide.primaryHref ?? "/"}>بیشتر بدانید</Link>
+              <Link href={slide.primaryHref ?? "/products"}>
+                {slide.primaryLabel ?? "مشاهده محصولات"}
+              </Link>
             </Button>
             {slide.secondaryHref && (
               <Button variant="outline" asChild className="w-full sm:w-auto">
                 <Link href={slide.secondaryHref} className="text-white border-white/60 hover:bg-white/10">
-                  تماس با ما
+                  {slide.secondaryLabel ?? "درخواست استعلام قیمت"}
                 </Link>
               </Button>
             )}
@@ -169,20 +171,6 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
             </div>
           </SwiperSlide>
         ))}
-        {/* Trust bar overlay - positioned on top of slider */}
-        <div className="absolute bottom-12 left-0 right-0 z-20 bg-transparent">
-          <Container>
-            <div className="mx-auto flex h-16 w-full max-w-7xl xl:max-w-[1400px] 2xl:max-w-[1600px] items-center justify-center gap-6 md:gap-10">
-                <Image
-                  src="/images/se-logo.svg"
-                  alt="schneider electric"
-                  width={300}
-                  height={84}
-                  className="h-18 w-auto opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0"
-                />
-            </div>
-          </Container>
-        </div>
       </Swiper>
 
       <style jsx global>{`

@@ -5,7 +5,7 @@ import { Heading } from "@/components/ui/Heading";
 import { Text } from "@/components/ui/Text";
 import { motion } from "motion/react";
 import { useEnterAnimation } from "@/lib/animations";
-import { Phone, Mail, MapPin } from "lucide-react";
+import { FileText, Mail, PackageSearch } from "lucide-react";
 import { ABOUT_CONTACT_ITEMS } from "@/constants";
 
 export function AboutContact() {
@@ -36,7 +36,7 @@ export function AboutContact() {
               آماده همکاری با شما هستیم
             </Heading>
             <Text className="text-white/90 text-sm sm:text-base font-light px-4">
-              برای کسب اطلاعات بیشتر و مشاوره رایگان با ما تماس بگیرید
+              برای بررسی محصول و قیمت، مشخصات پروژه یا کد تجهیز را ارسال کنید
             </Text>
           </motion.div>
           
@@ -44,9 +44,9 @@ export function AboutContact() {
             {ABOUT_CONTACT_ITEMS.map((item, idx) => (
               <motion.div key={idx} className="flex items-center gap-3 sm:gap-4" variants={variants.fadeInUp}>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-md rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                  {item.icon === "phone" && <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
+                  {item.icon === "catalog" && <PackageSearch className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
                   {item.icon === "mail" && <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
-                  {item.icon === "map" && <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
+                  {item.icon === "quote" && <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
                 </div>
                 <div>
                   <Text className="text-xs sm:text-sm font-medium text-white/90 mb-1">{item.label}</Text>

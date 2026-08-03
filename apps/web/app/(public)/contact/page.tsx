@@ -3,7 +3,6 @@ import { Container } from "@/components/ui/Container";
 import { ContactHero } from "@/components/pages/contact/ContactHero";
 import { ContactForm } from "@/components/pages/contact/ContactForm";
 import { ContactInfo } from "@/components/pages/contact/ContactInfo";
-// import { ContactMap } from "@/components/pages/contact/ContactMap";
 
 export const metadata: Metadata = {
   title: "تماس با ما",
@@ -19,7 +18,7 @@ export default function ContactPage() {
       <Container className="py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
           {/* Contact Form */}
-          <div className="lg:col-span-2">
+          <div id="quote-form" className="lg:col-span-2 scroll-mt-28">
             <ContactForm />
           </div>
 
@@ -28,9 +27,6 @@ export default function ContactPage() {
             <ContactInfo />
           </div>
         </div>
-
-        {/* Map Section */}
-        {/* <ContactMap /> */}
       </Container>
     </>
   );

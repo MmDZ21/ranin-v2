@@ -5,7 +5,7 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetOverlay,  } from "../ui/Sheet";
 import Link from "next/link";
 import Logo from "@/components/Logo";
-import { LogInIcon } from "lucide-react";
+import { FileText, LogInIcon } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Container } from "../ui/Container";
 import { NavBarConfig } from "@/constants";
@@ -55,7 +55,7 @@ export default function NavBar(props: NavBarConfig) {
                       </NavigationMenuTrigger>
                       {item.megaMenu ? (
                         <NavigationMenuContent className="bg-popover text-popover-foreground z-[60] border-border">
-                          <div className="grid grid-cols-2 gap-8 p-6 md:w-[800px]">
+                          <div className="grid grid-cols-3 gap-6 p-6 md:w-[900px]">
                             {item.megaMenu.columns.map((column, colIdx) => (
                               <div key={colIdx}>
                                 <h3 className="font-semibold text-foreground mb-4 text-lg">{column.title}</h3>
@@ -84,11 +84,16 @@ export default function NavBar(props: NavBarConfig) {
 
         {/* Desktop Right Side Actions */}
         <div className="hidden lg:flex items-center gap-4">
-          {/* Search Modal */}
           <SearchModal />
-          
-          {/* Sign In Button */}
-          <Button asChild variant="default" className="gap-2">
+
+          <Button asChild variant="default" size="lg" className="gap-2">
+            <Link href="/contact#quote-form">
+              <FileText className="h-4 w-4" />
+              درخواست استعلام قیمت
+            </Link>
+          </Button>
+
+          <Button asChild variant="ghost" className="gap-2">
             <Link href="/auth/login">
               <LogInIcon className="h-4 w-4" />
               ورود
@@ -96,7 +101,13 @@ export default function NavBar(props: NavBarConfig) {
           </Button>
         </div>
 
-        <button onClick={toggleMobileMenu} className="lg:hidden flex flex-col items-center justify-center w-8 h-8 space-y-1 z-20" aria-label="تغییر منوی موبایل">
+        <button
+          onClick={toggleMobileMenu}
+          className="lg:hidden flex flex-col items-center justify-center size-11 space-y-1 z-20"
+          aria-label={isMobileMenuOpen ? "بستن منوی اصلی" : "باز کردن منوی اصلی"}
+          aria-expanded={isMobileMenuOpen}
+          aria-controls="mobile-navigation"
+        >
           <span className={`w-6 h-0.5 bg-foreground transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
           <span className={`w-6 h-0.5 bg-foreground transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
           <span className={`w-6 h-0.5 bg-foreground transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
@@ -128,7 +139,7 @@ export default function NavBar(props: NavBarConfig) {
             </div>
           </div>
 
-          <nav className="flex-1 overflow-y-auto">
+          <nav id="mobile-navigation" className="flex-1 overflow-y-auto">
             <div className="px-4 py-2">
               {(props.items ?? []).map((item, idx) => (
                 <div key={idx} className="border-b border-border/50 last:border-b-0">
@@ -192,6 +203,15 @@ export default function NavBar(props: NavBarConfig) {
               ))}
             </div>
           </nav>
+
+          <div className="shrink-0 border-t border-border p-4">
+            <Button asChild size="lg" className="w-full gap-2">
+              <Link href="/contact#quote-form" onClick={() => setIsMobileMenuOpen(false)}>
+                <FileText className="h-4 w-4" />
+                درخواست استعلام قیمت
+              </Link>
+            </Button>
+          </div>
         </SheetContent>
       </Sheet>
       </Container>

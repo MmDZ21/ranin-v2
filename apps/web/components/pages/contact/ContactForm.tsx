@@ -83,7 +83,7 @@ export function ContactForm() {
       if (result.success) {
         setStatus({
           type: "success",
-          message: "پیام شما با موفقیت ارسال شد. به‌زودی با شما تماس خواهیم گرفت.",
+          message: "درخواست شما با موفقیت ثبت شد. تیم فروش برای پیگیری با شما تماس می‌گیرد.",
         });
         setFormData(initialFormData);
       } else {
@@ -109,7 +109,7 @@ export function ContactForm() {
         </div>
         <div>
           <Heading level={2} className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-            ارسال پیام
+            ثبت درخواست استعلام
           </Heading>
         </div>
       </motion.div>
@@ -202,7 +202,7 @@ export function ContactForm() {
         
         <div>
           <label htmlFor="subject" className="block text-xs sm:text-sm font-semibold text-gray-900 mb-2">
-            موضوع
+            کد محصول یا موضوع درخواست
           </label>
           <Input
             id="subject"
@@ -211,13 +211,13 @@ export function ContactForm() {
             value={formData.subject}
             onChange={handleInputChange}
             className="rounded-lg md:h-12 text-xs border-border placeholder:text-muted-foreground/50"
-            placeholder="موضوع پیام خود را وارد کنید"
+            placeholder="برای نمونه: P3U20 یا استعلام رله حفاظت فیدر"
           />
         </div>
 
         <div>
           <label htmlFor="message" className="block text-xs sm:text-sm font-semibold text-gray-900 mb-2">
-            پیام
+            مشخصات فنی و توضیحات
           </label>
           <textarea
             id="message"
@@ -227,7 +227,7 @@ export function ContactForm() {
             value={formData.message}
             onChange={handleInputChange}
             className="w-full px-3 py-4 rounded-lg text-xs md:text-sm border shadow-sm border-border placeholder:text-muted-foreground/50"
-            placeholder="پیام خود را بنویسید..."
+            placeholder="تعداد، ولتاژ شبکه، کاربرد تجهیز و زمان موردنیاز را بنویسید"
           />
         </div>
         
@@ -263,7 +263,7 @@ export function ContactForm() {
             ) : (
               <Send className="w-4 h-4" />
             )}
-            {isPending ? "در حال ارسال..." : "ارسال پیام"}
+            {isPending ? "در حال ارسال..." : "ارسال درخواست"}
           </Button>
         </motion.div>
       </motion.form>

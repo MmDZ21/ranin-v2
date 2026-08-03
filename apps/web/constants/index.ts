@@ -3,7 +3,6 @@ import {
   LayoutDashboard, 
   Package, 
   FolderTree, 
-  ShoppingCart, 
   Users, 
   Settings,
   BookOpen,
@@ -22,13 +21,13 @@ export type TopBarConfig = {
 
 export const TOPBAR_CONFIG: TopBarConfig = {
   message:
-    'نمایندگی رسمی محصولات اشنایدر الکتریک — تأمین‌کننده تجهیزات برق صنعتی و اتوماسیون',
-  shortMessage: 'نمایندگی اشنایدر الکتریک',
+    'تأمین رله‌های حفاظتی و تجهیزات حفاظت الکتریکی برای پروژه‌های صنعتی',
+  shortMessage: 'تجهیزات حفاظت الکتریکی صنعتی',
   showLanguage: true,
   languageLabel: 'فا',
   showContact: true,
-  contactLabel: 'درخواست مشاوره و پیش‌فاکتور',
-  contactHref: '/contact',
+  contactLabel: 'درخواست استعلام قیمت',
+  contactHref: '/contact#quote-form',
 };
 
 export type NavBarConfig = {
@@ -59,46 +58,33 @@ export const NAVBAR_CONFIG: NavBarConfig = {
       megaMenu: {
         columns: [
           {
-            title: "راهکارهای کسب‌وکار",
+            title: "حفاظت و پایش",
             links: [
-              { label: "مدیریت پروژه", href: "/products/project-management", description: "ابزارهای پیشرفته مدیریت پروژه" },
-              { label: "تحلیل داده", href: "/products/analytics", description: "تحلیل و گزارش‌گیری هوشمند" },
-              { label: "اتوماسیون", href: "/products/automation", description: "خودکارسازی فرآیندهای کسب‌وکار" }
+              { label: "رله‌های حفاظتی", href: "/products?category=protection-relays", description: "حفاظت فیدر، موتور و شبکه قدرت" },
+              { label: "رله‌های MiCOM", href: "/products?category=micom-relays", description: "رله‌های حفاظتی سری MiCOM" },
+              { label: "دستگاه‌های PowerLogic", href: "/products?category=power-logic-devices", description: "پایش و اندازه‌گیری پارامترهای شبکه" }
             ]
           },
           {
-            title: "راهکارهای فنی",
+            title: "کنترل و توزیع",
             links: [
-              { label: "توسعه نرم‌افزار", href: "/products/software-development", description: "توسعه اپلیکیشن‌های کاربردی" },
-              { label: "زیرساخت ابری", href: "/products/cloud-infrastructure", description: "خدمات ابری و میزبانی" },
-              { label: "امنیت سایبری", href: "/products/cybersecurity", description: "حفاظت از داده‌ها و سیستم‌ها" }
+              { label: "تجهیزات کنترل", href: "/products?category=control-devices", description: "کنترل و اتوماسیون تجهیزات صنعتی" },
+              { label: "کلیدهای مدار", href: "/products?category=circuit-breakers", description: "حفاظت مدارهای توزیع و قدرت" },
+              { label: "تابلوهای کنترل", href: "/products?category=control-panels", description: "تابلوهای کنترل و حفاظت" }
+            ]
+          },
+          {
+            title: "تجهیزات تکمیلی",
+            links: [
+              { label: "ترانسفورماتورها", href: "/products?category=transformers", description: "تجهیزات تبدیل و توزیع توان" },
+              { label: "کابل‌ها و سیم‌ها", href: "/products?category=cables-wires", description: "کابل و سیم مورد استفاده در پروژه‌های برق" },
+              { label: "سنسورها و ابزار دقیق", href: "/products?category=sensors-instruments", description: "اندازه‌گیری و پایش فرایند" }
             ]
           }
         ]
       }
     },
-    { 
-      label: "خدمات", 
-      megaMenu: {
-        columns: [
-          {
-            title: "مشاوره",
-            links: [
-              { label: "مشاوره استراتژیک", href: "/services/strategy", description: "برنامه‌ریزی استراتژیک کسب‌وکار" },
-              { label: "مشاوره فنی", href: "/services/technical", description: "راهنمایی‌های تخصصی فنی" }
-            ]
-          },
-          {
-            title: "پیاده‌سازی",
-            links: [
-              { label: "راه‌اندازی سیستم", href: "/services/implementation", description: "پیاده‌سازی سیستم‌های سازمانی" },
-              { label: "آموزش", href: "/services/training", description: "آموزش کاربران و تیم‌ها" }
-            ]
-          }
-        ]
-      }
-    },
-    { label: "بینش‌ها", href: "/insights" },
+    { label: "همه محصولات", href: "/products" },
     { label: "درباره ما", href: "/about" },
     { label: "تماس", href: "/contact" },
   ]
@@ -113,31 +99,39 @@ export type HeroSlide = {
   headline: string
   sub?: string
   primaryHref?: string
+  primaryLabel?: string
   secondaryHref?: string
+  secondaryLabel?: string
 }
 
 export const HERO_CONFIG: HeroConfig = {
   slides: [
     {
       image: "/images/slide-1.jpg",
-      headline: "تجهیزات برق صنعتی و ساختمانی",
-      sub: "ارائه بهترین کلیدها، ترانسفورماتورها و تابلوهای برق با استانداردهای بین‌المللی و کیفیت برتر.",
+      headline: "رله‌های حفاظتی برای شبکه‌های برق صنعتی",
+      sub: "مشخصات فنی محصولات را بررسی کنید و برای انتخاب تجهیز متناسب با پروژه، استعلام قیمت بگیرید.",
       primaryHref: "/products",
-      secondaryHref: "/contact",
+      primaryLabel: "مشاهده محصولات",
+      secondaryHref: "/contact#quote-form",
+      secondaryLabel: "درخواست استعلام قیمت",
     },
     {
       image: "/images/slide-2.jpg",
-      headline: "مشاوره تخصصی و خدمات فنی",
-      sub: "تیم مجرب ما آماده ارائه مشاوره رایگان و پشتیبانی کامل در انتخاب بهترین تجهیزات برای پروژه شماست.",
-      primaryHref: "/about",
-      secondaryHref: "/contact",
+      headline: "انتخاب تجهیز بر پایه نیاز فنی پروژه",
+      sub: "نوع حفاظت، مشخصات شبکه و کد فنی موردنیاز را ارسال کنید تا درخواست شما دقیق‌تر بررسی شود.",
+      primaryHref: "/contact#quote-form",
+      primaryLabel: "ثبت درخواست فنی",
+      secondaryHref: "/products",
+      secondaryLabel: "مرور کاتالوگ",
     },
     {
       image: "/images/slide-3.jpg",
-      headline: "سرعت در تحویل و کیفیت مطمئن",
-      sub: "با شبکه توزیع گسترده و انبارداری مدرن، محصولات با سرعت و دقت بالا به دست شما می‌رسد.",
-      primaryHref: "/services",
-      secondaryHref: "/contact",
+      headline: "استعلام موجودی و قیمت تجهیزات حفاظتی",
+      sub: "کد محصول، تعداد و زمان موردنیاز را در فرم تماس وارد کنید تا تیم فروش درخواست شما را پیگیری کند.",
+      primaryHref: "/contact#quote-form",
+      primaryLabel: "درخواست پیش‌فاکتور",
+      secondaryHref: "/products",
+      secondaryLabel: "مشاهده محصولات",
     },
   ]
 }
@@ -167,17 +161,17 @@ export type AnimatedFeaturesProps = {
 
 export const ANIMATED_FEATURES_CONFIG: AnimatedFeaturesProps[] = [
   {
-    sectionTitle: "مشاوره تخصصی",
-    title: "مشاوره تخصصی خرید",
-    description: "با افتخار در کنار شما هستیم تا بهترین انتخاب را داشته باشید. تیم مشاوره تخصصی ما با تجربه‌ی سال‌ها فعالیت در حوزه تجهیزات برق صنعتی و ساختمانی، آماده است تا متناسب با نیاز دقیق شما—از ظرفیت جریان گرفته تا استانداردهای بین‌المللی—بهترین راهکارها را پیشنهاد دهد. مشاوران ما نه تنها در زمینه انواع کلیدها، ترانسفورماتورها و تابلوهای برق تخصص دارند، بلکه در مورد جدیدترین فناوری‌های روز دنیا نیز به‌روز هستند. با ما تماس بگیرید تا با مشاوره‌ای تخصصی و رایگان، بهترین تصمیم را برای پروژه‌ی خود بگیرید.",
+    sectionTitle: "انتخاب فنی",
+    title: "محصول را با مشخصات پروژه تطبیق دهید",
+    description: "نوع حفاظت، ولتاژ شبکه، کاربرد تجهیز و کد فنی موردنظر را در درخواست خود ثبت کنید. این اطلاعات مسیر بررسی محصول و استعلام قیمت را روشن‌تر می‌کند و از رفت‌وبرگشت‌های غیرضروری می‌کاهد.",
     imageSrc: "/images/advice.png",
     imageAlt: "مشاوره تخصصی خرید",
     background: "default",
   },
   {
-    sectionTitle: "تحویل فوری",
-    title: "ارسال سریع",
-    description: "با سیستم ارسال سریع ما، فاصله‌ی بین سفارش تا دریافت محصول به حداقل می‌رسد. کافیست محصول مورد نظر خود را انتخاب کنید تا در کوتاه‌ترین زمان، بسته‌ی شما با بسته‌بندی ایمن و استاندارد، مستقیماً از انبار ما به دستتان برسد. سرعت، دقت و اطمینان سه اصل اساسی خدمات تحویل ما هستند. شبکه ارسال گسترده ما امکان تحویل سریع به تمام نقاط کشور را فراهم کرده و با پیگیری لحظه‌ای، همواره از وضعیت سفارش خود مطلع خواهید بود. همچنین امکان ارسال فوری برای سفارش‌های اورژانسی و پروژه‌های حساس نیز در دسترس شماست.",
+    sectionTitle: "فرایند درخواست",
+    title: "از کد محصول تا استعلام قیمت",
+    description: "محصول را از کاتالوگ انتخاب کنید یا کد تجهیز را برای ما بفرستید. تیم فروش پس از بررسی مشخصات ثبت‌شده، برای ادامه فرایند تأمین و هماهنگی درخواست با شما در ارتباط خواهد بود.",
     imageSrc: "/images/delivery.png",
     imageAlt: "ارسال سریع",
     reverse: true,
@@ -203,10 +197,10 @@ export const PARALLAX_SECTION_CONFIG: ParallaxSectionProps = {
   height: "medium",
   overlay: true,
   overlayOpacity: 0.7,
-  title: "راه‌حل‌های نوآورانه برای صنعت برق",
-  subtitle: "با تکنولوژی پیشرفته و تجربه چندین ساله، بهترین راه‌حل‌ها را برای پروژه‌های برق صنعتی و ساختمانی ارائه می‌دهیم.",
-  ctaText: "مشاهده محصولات",
-  ctaHref: "/products",
+  title: "تجهیزات حفاظت الکتریکی برای پروژه‌های صنعتی",
+  subtitle: "کاتالوگ رله‌های حفاظتی و تجهیزات پایش را مرور کنید یا مشخصات فنی پروژه را برای استعلام ارسال کنید.",
+  ctaText: "درخواست استعلام قیمت",
+  ctaHref: "/contact#quote-form",
   textAlign: "center",
   textColor: "white",
 }
@@ -229,7 +223,7 @@ export type ProductsCategoriesConfig = {
 
 export const PRODUCTS_CATEGORIES_CONFIG: ProductsCategoriesConfig = {
   title: "دسته‌بندی محصولات",
-  subtitle: "انواع تجهیزات برق صنعتی و ساختمانی با کیفیت و استاندارد برتر.",
+  subtitle: "مرور دسته‌های رله حفاظتی، پایش شبکه و تجهیزات کنترل و توزیع.",
   ctaText: "مشاهده همه محصولات",
   ctaHref: "/products",
   categories: [
@@ -260,15 +254,15 @@ export const PRODUCTS_CATEGORIES_CONFIG: ProductsCategoriesConfig = {
 export type NewsletterSectionProps = {
   title: string
   subtitle: string
-  placeholder: string
   buttonText: string
+  buttonHref: string
 }
 
 export const NEWSLETTER_SECTION_CONFIG: NewsletterSectionProps = {
-  title: "عضویت در خبرنامه",
-  subtitle: "با عضویت در خبرنامه ما از آخرین محصولات، تخفیف‌های ویژه و اخبار فنی دنیای برق مطلع شوید.",
-  placeholder: "ایمیل خود را وارد کنید",
-  buttonText: "عضویت",
+  title: "برای پروژه خود استعلام فنی و قیمت بگیرید",
+  subtitle: "کد محصول، تعداد و مشخصات شبکه را ارسال کنید تا درخواست شما با اطلاعات کامل‌تری بررسی شود.",
+  buttonText: "ثبت درخواست استعلام",
+  buttonHref: "/contact#quote-form",
 }
 
 export type FooterLink = {
@@ -293,34 +287,25 @@ export const FOOTER_CONFIG: FooterConfig = {
     { label: "تماس با ما", href: "/contact" },
   ],
   services: [
-    { label: "فروش تجهیزات", href: "/services/equipment" },
-    { label: "مشاوره فنی", href: "/services/consulting" },
+    { label: "کاتالوگ تجهیزات", href: "/products" },
+    { label: "استعلام قیمت", href: "/contact#quote-form" },
   ],
   contactEmail: "sales@raninfarayand.com",
 }
 
 export type ContactDetails = {
-  phones: string[]
   emails: string[]
-  addressLines: string[]
-  workHours: string[]
 }
 
 export const CONTACT_DETAILS: ContactDetails = {
-  phones: ["۰۲۱-۱۲۳۴۵۶۷۸", "۰۹۱۲-۳۴۵۶۷۸۹"],
   emails: ["info@raninfarayand.com", "sales@raninfarayand.com"],
-  addressLines: ["تهران، خیابان ولیعصر", "پلاک ۱۲۳۴، طبقه دوم"],
-  workHours: [
-    "شنبه تا چهارشنبه: ۸:۰۰ - ۱۷:۰۰",
-    "پنج‌شنبه: ۸:۰۰ - ۱۳:۰۰",
-  ],
 }
 
 export const CONTACT_SERVICES: string[] = [
-  "مشاوره تخصصی خرید",
-  "پشتیبانی فنی",
-  "نصب و راه‌اندازی",
-  "گارانتی و خدمات پس از فروش",
+  "انتخاب رله حفاظتی متناسب با کاربرد",
+  "بررسی مشخصات فنی موردنیاز پروژه",
+  "استعلام قیمت و موجودی محصول",
+  "پیگیری درخواست فروش",
 ];
 
 export type AboutHeroConfig = {
@@ -334,10 +319,10 @@ export type AboutHeroConfig = {
 
 export const ABOUT_HERO_CONFIG: AboutHeroConfig = {
   title: "رانین فرایند",
-  subtitle: "پیشرو در ارائه تجهیزات برق صنعتی و ساختمانی",
+  subtitle: "تأمین تجهیزات حفاظت الکتریکی برای پروژه‌های صنعتی",
   description:
-    "با بیش از دو دهه تجربه در حوزه انرژی و برق، ما به عنوان یکی از پیشروترین شرکت‌های توزیع تجهیزات برق صنعتی و ساختمانی در کشور، آماده ارائه بهترین خدمات و محصولات با کیفیت برتر به مشتریان خود هستیم. تیم متخصص ما با دانش فنی عمیق و تجربه گسترده در پروژه‌های مختلف، قادر به ارائه راهکارهای جامع و نوآورانه برای تمامی نیازهای برقی شما می‌باشد.",
-  primaryCta: { label: "تماس با ما", href: "/contact" },
+    "رانین فرایند بر تأمین رله‌های حفاظتی، تجهیزات پایش شبکه و ملزومات حفاظت الکتریکی تمرکز دارد. برای انتخاب محصول می‌توانید مشخصات فنی و کد تجهیز موردنیاز پروژه را از طریق فرم استعلام ارسال کنید.",
+  primaryCta: { label: "درخواست استعلام قیمت", href: "/contact#quote-form" },
   secondaryCta: { label: "مشاهده محصولات", href: "/products" },
   image: { src: "/images/slide-1.jpg", alt: "رانین فرایند - تجهیزات برق صنعتی" },
 }
@@ -354,27 +339,14 @@ export const ABOUT_MISSION_VISION: AboutMissionVisionItem[] = [
     image: { src: "/images/slide-2.jpg", alt: "مشاوره تخصصی و خدمات فنی" },
     icon: "award",
     title: "ماموریت ما",
-    text: "ارائه بهترین تجهیزات برق صنعتی و ساختمانی با کیفیت برتر و استانداردهای بین‌المللی.",
+    text: "ساده‌تر کردن بررسی و تأمین تجهیزات حفاظت الکتریکی بر پایه مشخصات فنی پروژه.",
   },
   {
     image: { src: "/images/slide-3.jpg", alt: "سرعت در تحویل و کیفیت مطمئن" },
     icon: "users",
     title: "چشم‌انداز ما",
-    text: "تبدیل شدن به پیشروترین شرکت در حوزه تجهیزات برق صنعتی در منطقه.",
+    text: "ایجاد یک مسیر روشن و قابل پیگیری از انتخاب محصول تا درخواست فروش.",
   },
-]
-
-export type AboutStat = {
-  icon: "award" | "users" | "check" | "clock"
-  value: string
-  label: string
-}
-
-export const ABOUT_STATS: AboutStat[] = [
-  { icon: "award", value: "۲۰+", label: "سال تجربه" },
-  { icon: "users", value: "۵۰۰+", label: "مشتری راضی" },
-  { icon: "check", value: "۱۰۰۰+", label: "پروژه موفق" },
-  { icon: "clock", value: "۲۴/۷", label: "پشتیبانی" },
 ]
 
 export type AboutValue = {
@@ -390,15 +362,15 @@ export const ABOUT_VALUES: AboutValue[] = [
 ]
 
 export type AboutContactItem = {
-  icon: "phone" | "mail" | "map"
+  icon: "catalog" | "mail" | "quote"
   label: string
   value: string
 }
 
 export const ABOUT_CONTACT_ITEMS: AboutContactItem[] = [
-  { icon: "phone", label: "تلفن", value: CONTACT_DETAILS.phones[0] },
+  { icon: "catalog", label: "محصولات", value: "مرور تجهیزات و مشخصات فنی" },
   { icon: "mail", label: "ایمیل", value: CONTACT_DETAILS.emails[0] },
-  { icon: "map", label: "آدرس", value: CONTACT_DETAILS.addressLines[0] },
+  { icon: "quote", label: "استعلام قیمت", value: "ثبت درخواست از طریق فرم تماس" },
 ]
 export type ProductDTO = {
   id: string;
@@ -430,36 +402,36 @@ export const productCategories: ProductCategoryType[] = [
     products: [
       {
         id: "p3u20-6aaa2agaa",
-        name: "P3U20-6AAA2AGAA",
+        name: "رله حفاظتی P3U20-6AAA2AGAA",
         slug: slugify("P3U20-6AAA2AGAA"),
-        description: "Schneider Electric product (relay/protection device)",
+        description: "رله حفاظتی با کد فنی P3U20-6AAA2AGAA",
         code: "P3U20-6AAA2AGAA",
         catalogUrl: null,
         imageUrl: "/images/relay.png",
       },
       {
         id: "p3u30-6aaa2bbaa",
-        name: "P3U30-6AAA2BBAA",
+        name: "رله حفاظتی P3U30-6AAA2BBAA",
         slug: slugify("P3U30-6AAA2BBAA"),
-        description: "Schneider Electric product",
+        description: "رله حفاظتی با کد فنی P3U30-6AAA2BBAA",
         code: "P3U30-6AAA2BBAA",
         catalogUrl: null,
         imageUrl: "/images/relay.png",
       },
       {
         id: "p1f1-rel-15013d",
-        name: "Power Logic Protection Relay P1F1-REL 15013D",
+        name: "رله حفاظتی PowerLogic P1F1-REL 15013D",
         slug: slugify("Power Logic Protection Relay P1F1-REL 15013D"),
-        description: "Power Logic Protection Relay",
+        description: "رله حفاظتی PowerLogic با کد فنی P1F1-REL-15013D",
         code: "P1F1-REL-15013D",
         catalogUrl: null,
         imageUrl: "/images/relay.png",
       },
       {
         id: "p1f1-rel-15012d",
-        name: "Power Logic Protection Relay P1F1-REL 15012D",
+        name: "رله حفاظتی PowerLogic P1F1-REL 15012D",
         slug: slugify("Power Logic Protection Relay P1F1-REL 15012D"),
-        description: "Power Logic Protection Relay",
+        description: "رله حفاظتی PowerLogic با کد فنی P1F1-REL-15012D",
         code: "P1F1-REL-15012D",
         catalogUrl: null,
         imageUrl: "/images/relay.png",
@@ -477,7 +449,7 @@ export const productCategories: ProductCategoryType[] = [
         id: "micom-p632",
         name: "MiCOM P632",
         slug: slugify("MiCOM P632"),
-        description: "MiCOM protection relay",
+        description: "رله حفاظتی MiCOM P632",
         code: "P632-3B9011F0-316-421-675-705-463-921",
         catalogUrl: null,
         imageUrl: "/images/relay.png",
@@ -493,27 +465,27 @@ export const productCategories: ProductCategoryType[] = [
     products: [
       {
         id: "p3g32-cgita-aaefa-baaaa",
-        name: "P3G32-CGITA-AAEFA-BAAAA",
+        name: "تجهیز پایش P3G32-CGITA-AAEFA-BAAAA",
         slug: slugify("P3G32-CGITA-AAEFA-BAAAA"),
-        description: "Schneider Electric product",
+        description: "تجهیز پایش شبکه با کد فنی P3G32-CGITA-AAEFA-BAAAA",
         code: "P3G32-CGITA-AAEFA-BAAAA",
         catalogUrl: null,
         imageUrl: "/images/relay.png",
       },
       {
         id: "p3m32-cgita-aaefa-baaaa",
-        name: "P3M32-CGITA-AAEFA-BAAAA",
+        name: "تجهیز پایش P3M32-CGITA-AAEFA-BAAAA",
         slug: slugify("P3M32-CGITA-AAEFA-BAAAA"),
-        description: "Schneider Electric product",
+        description: "تجهیز پایش شبکه با کد فنی P3M32-CGITA-AAEFA-BAAAA",
         code: "P3M32-CGITA-AAEFA-BAAAA",
         catalogUrl: null,
         imageUrl: "/images/relay.png",
       },
       {
         id: "p3t32-cgg1a-aa1fa-baaaa",
-        name: "P3T32-CGG1A-AA1FA-BAAAA",
+        name: "تجهیز پایش P3T32-CGG1A-AA1FA-BAAAA",
         slug: slugify("P3T32-CGG1A-AA1FA-BAAAA"),
-        description: "Schneider Electric product",
+        description: "تجهیز پایش شبکه با کد فنی P3T32-CGG1A-AA1FA-BAAAA",
         code: "P3T32-CGG1A-AA1FA-BAAAA",
         catalogUrl: null,
         imageUrl: "/images/relay.png",
@@ -529,18 +501,18 @@ export const productCategories: ProductCategoryType[] = [
     products: [
       {
         id: "p127-aa0z112gb0",
-        name: "P127-AA0Z112GB0",
+        name: "تجهیز کنترل P127-AA0Z112GB0",
         slug: slugify("P127-AA0Z112GB0"),
-        description: "Schneider Electric product",
+        description: "تجهیز کنترل با کد فنی P127-AA0Z112GB0",
         code: "P127-AA0Z112GB0",
         catalogUrl: null,
         imageUrl: "/images/relay.png",
       },
       {
         id: "p3u30-6aaa1bbaa",
-        name: "P3U30-6AAA1BBAA",
+        name: "تجهیز کنترل P3U30-6AAA1BBAA",
         slug: slugify("P3U30-6AAA1BBAA"),
-        description: "Schneider Electric product",
+        description: "تجهیز کنترل با کد فنی P3U30-6AAA1BBAA",
         code: "P3U30-6AAA1BBAA",
         catalogUrl: null,
         imageUrl: "/images/relay.png",

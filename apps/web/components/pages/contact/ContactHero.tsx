@@ -27,7 +27,7 @@ export function ContactHero() {
           variants={variants.fadeInUp}
         >
           <Separator orientation="horizontal" className="!w-4 bg-primary" />
-          <h1 className="text-sm text-primary font-bold">تماس با ما</h1>
+          <span className="text-sm text-primary font-bold">استعلام و تماس</span>
         </motion.div>
 
         {/* Hero Section */}
@@ -56,7 +56,7 @@ export function ContactHero() {
             <div className="text-center text-white">
               <motion.div variants={variants.fadeInUp}>
                 <Heading level={1} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6 leading-tight">
-                  با ما در تماس باشید
+                  استعلام فنی و قیمت تجهیزات حفاظتی
                 </Heading>
               </motion.div>
               <motion.div variants={variants.fadeInUp}>
@@ -64,7 +64,7 @@ export function ContactHero() {
               </motion.div>
               <motion.div variants={variants.fadeInUp}>
                 <Text className="text-base sm:text-lg text-white/90 max-w-3xl mx-auto leading-loose font-light">
-                  تیم متخصص ما آماده پاسخگویی به سوالات شما و ارائه مشاوره رایگان
+                  کد محصول، تعداد و مشخصات فنی پروژه را ارسال کنید تا درخواست شما بررسی شود.
                 </Text>
               </motion.div>
             </div>

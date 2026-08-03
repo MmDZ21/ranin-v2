@@ -30,12 +30,16 @@ export default function ProductImages({
 }) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
   const [mainSwiper, setMainSwiper] = useState<SwiperType | null>(null);
+  const hasMultipleImages = images.length > 1;
 
   return (
-    <section className={cn("bg-transparent py-12 overflow-x-hidden", className)}>
-      <div className="container overflow-x-hidden">
+    <section
+      className={cn("overflow-x-hidden bg-transparent", className)}
+      aria-label="تصاویر محصول"
+    >
+      <div className="overflow-x-hidden">
         {images.length === 0 ? (
-          <div className="h-96 w-full overflow-hidden rounded-xl border border-border">
+          <div className="aspect-square w-full overflow-hidden rounded-xl border border-border sm:aspect-[4/3]">
             <ProductMediaFallback label={fallbackLabel} variant="detail" />
           </div>
         ) : (
@@ -47,11 +51,11 @@ export default function ProductImages({
                 spaceBetween={10}
                 thumbs={{ swiper: thumbsSwiper }}
                 modules={[FreeMode, Navigation, Thumbs]}
-                className="h-96 w-full rounded-lg overflow-hidden"
+                className="aspect-square w-full overflow-hidden rounded-xl border border-border bg-muted sm:aspect-[4/3]"
               >
                 {images.map((image, index) => (
                   <SwiperSlide key={index}>
-                    <div className="relative overflow-hidden flex h-full w-full items-center justify-center rounded-lg">
+                    <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
                       <ProductMedia
                         src={image.src ?? image.url}
                         alt={image.alt || fallbackLabel || "تصویر محصول"}
@@ -65,49 +69,59 @@ export default function ProductImages({
                 ))}
               </Swiper>
               
-              {/* Custom Navigation Buttons */}
-              <button
-                onClick={() => mainSwiper?.slidePrev()}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-all duration-200"
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="w-4 h-4 text-gray-700" />
-              </button>
-              
-              <button
-                onClick={() => mainSwiper?.slideNext()}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-all duration-200"
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-4 h-4 text-gray-700" />
-              </button>
+              {hasMultipleImages ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => mainSwiper?.slideNext()}
+                    className="absolute right-3 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg border border-border bg-background/95 text-foreground shadow-theme-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label="تصویر بعدی"
+                  >
+                    <ChevronRight className="size-5" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => mainSwiper?.slidePrev()}
+                    className="absolute left-3 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg border border-border bg-background/95 text-foreground shadow-theme-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label="تصویر قبلی"
+                  >
+                    <ChevronLeft className="size-5" />
+                  </button>
+                </>
+              ) : null}
             </div>
 
-            {/* Thumbnail */}
-            <Swiper
-              onSwiper={setThumbsSwiper}
-              loop={true}
-              spaceBetween={12}
-              slidesPerView={4}
-              freeMode={true}
-              watchSlidesProgress={true}
-              modules={[FreeMode, Navigation, Thumbs]}
-              className="thumbs mt-3 h-32 w-full rounded-lg overflow-hidden"
-            >
-              {images.map((image, index) => (
-                <SwiperSlide key={index}>
-                  <button className="relative overflow-hidden flex h-full w-full items-center justify-center rounded-lg">
-                    <ProductMedia
-                      src={image.src ?? image.url}
-                      alt={image.alt || fallbackLabel || "تصویر محصول"}
-                      label={fallbackLabel}
-                      variant="compact"
-                      sizes="(max-width: 1024px) 25vw, 13vw"
-                    />
-                  </button>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+            {hasMultipleImages ? (
+              <Swiper
+                onSwiper={setThumbsSwiper}
+                loop={true}
+                spaceBetween={10}
+                slidesPerView={4}
+                freeMode={true}
+                watchSlidesProgress={true}
+                modules={[FreeMode, Navigation, Thumbs]}
+                className="thumbs mt-3 h-20 w-full overflow-hidden sm:h-24"
+              >
+                {images.map((image, index) => (
+                  <SwiperSlide key={image.url ?? image.src ?? index}>
+                    <button
+                      type="button"
+                      className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg border border-border bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      aria-label={`نمایش تصویر ${index + 1}`}
+                    >
+                      <ProductMedia
+                        src={image.src ?? image.url}
+                        alt={image.alt || fallbackLabel || "تصویر محصول"}
+                        label={fallbackLabel}
+                        variant="compact"
+                        sizes="(max-width: 1024px) 25vw, 13vw"
+                      />
+                    </button>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) : null}
           </>
         )}
       </div>

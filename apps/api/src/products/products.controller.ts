@@ -11,7 +11,7 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { ProductsService } from './products.service';
+import { ProductsService, type PaginatedProducts } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AdvancedSearchDto } from './dto/advanced-search.dto';
@@ -30,7 +30,10 @@ export class ProductsController {
 
   @Get()
   async findPublished(@Query() pagination: PaginationDto): Promise<Product[]> {
-    return this.productsService.findPublished(pagination.limit ?? 20);
+    return this.productsService.findPublished(
+      pagination.limit ?? 20,
+      pagination.offset ?? 0,
+    );
   }
 
   @Get('search')
@@ -55,13 +58,12 @@ export class ProductsController {
   @Get('category/:categoryId')
   async findByCategory(
     @Param('categoryId') categoryId: string,
-    @Query('limit') limit?: string,
-    @Query('offset') offset?: string,
-  ): Promise<Product[]> {
+    @Query() pagination: PaginationDto,
+  ): Promise<PaginatedProducts> {
     return this.productsService.findByCategory(
       categoryId,
-      Number(limit) || 20,
-      Number(offset) || 0,
+      pagination.limit ?? 20,
+      pagination.offset ?? 0,
     );
   }
 

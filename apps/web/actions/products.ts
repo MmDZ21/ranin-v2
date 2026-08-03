@@ -1,7 +1,7 @@
 'use server'
 
 import { fetchClient } from '@/lib/fetchClient'
-import { Product } from '@/types/product.types'
+import type { PaginatedProducts, Product } from '@/types/product.types'
 import { Category } from '@/types/category.types'
 
 export interface ApiResponse<T> {
@@ -32,9 +32,16 @@ export async function getCategories(): Promise<ApiResponse<Category[]>> {
 /**
  * Fetch products by category slug from the API
  */
-export async function getProductsByCategory(categoryId: string): Promise<ApiResponse<Product[]>> {
+export async function getProductsByCategory(
+  categoryId: string,
+  page = 1,
+  limit = 12,
+): Promise<ApiResponse<PaginatedProducts>> {
   try {
-    const products = await fetchClient(`/products/category/${categoryId}`)
+    const offset = (page - 1) * limit
+    const products = await fetchClient(
+      `/products/category/${categoryId}?limit=${limit}&offset=${offset}`,
+    )
     return { 
       success: true, 
       data: products 

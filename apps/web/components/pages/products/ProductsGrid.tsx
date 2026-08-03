@@ -4,6 +4,7 @@ import { Product } from "@/types/product.types";
 import ProductCard from "@/components/ui/ProductCard";
 import { motion } from "motion/react";
 import { useEnterAnimation } from "@/lib/animations";
+import { cn } from "@/lib/utils";
 
 interface ProductsGridProps {
   products: Product[];
@@ -14,6 +15,15 @@ export function ProductsGrid({ products }: ProductsGridProps) {
     staggerDelay: 0.1,
     textDuration: 0.4,
   });
+
+  const gridColumns = cn(
+    "grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8",
+    products.length >= 3 && "lg:grid-cols-3",
+    products.length >= 4 && "xl:grid-cols-4",
+    products.length === 1 && "mx-auto max-w-md",
+    products.length === 2 && "mx-auto max-w-4xl",
+    products.length === 3 && "mx-auto max-w-6xl",
+  );
 
   return (
     <motion.div 
@@ -38,7 +48,7 @@ export function ProductsGrid({ products }: ProductsGridProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+        <div className={gridColumns}>
           {products.map((product, index) => (
             <motion.div
               key={product.id}

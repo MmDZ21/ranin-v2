@@ -5,6 +5,13 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { AdvancedSearchDto } from './dto/advanced-search.dto';
 import { Product } from '../generated/client';
 
+export type PaginatedProducts = {
+  items: Product[];
+  total: number;
+  limit: number;
+  offset: number;
+};
+
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
@@ -33,10 +40,11 @@ export class ProductsService {
   }
 
   // Get published products (public endpoint)
-  async findPublished(limit = 20): Promise<Product[]> {
+  async findPublished(limit = 20, offset = 0): Promise<Product[]> {
     return this.prisma.product.findMany({
       where: { published: true },
       take: limit,
+      skip: offset,
       orderBy: { createdAt: 'desc' },
       include: {
         category: true,
@@ -194,17 +202,23 @@ export class ProductsService {
     categoryId: string,
     limit = 20,
     offset = 0,
-  ): Promise<Product[]> {
-    return this.prisma.product.findMany({
-      where: { categoryId, published: true },
-      take: limit,
-      skip: offset,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        category: true,
-        images: { orderBy: { order: 'asc' } },
-      },
-    });
+  ): Promise<PaginatedProducts> {
+    const where = { categoryId, published: true };
+    const [items, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        take: limit,
+        skip: offset,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          category: true,
+          images: { orderBy: { order: 'asc' } },
+        },
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return { items, total, limit, offset };
   }
 
   // Search products - searches across all relevant fields
